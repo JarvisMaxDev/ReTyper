@@ -147,9 +147,13 @@ final class PopoverViewController: NSViewController {
             row.heightAnchor.constraint(equalToConstant: 36),
         ])
         
-        if !granted {
-            let clickGesture = NSClickGestureRecognizer(target: self, action: #selector(openPrivacySettings))
-            row.addGestureRecognizer(clickGesture)
+        // Always clickable — opens the correct System Settings pane
+        if name == "Accessibility" {
+            let click = NSClickGestureRecognizer(target: self, action: #selector(openAccessibilitySettings))
+            row.addGestureRecognizer(click)
+        } else {
+            let click = NSClickGestureRecognizer(target: self, action: #selector(openInputMonitoringSettings))
+            row.addGestureRecognizer(click)
         }
         
         return row
@@ -557,7 +561,11 @@ final class PopoverViewController: NSViewController {
         onQuit?()
     }
     
-    @objc private func openPrivacySettings() {
+    @objc private func openAccessibilitySettings() {
         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+    }
+    
+    @objc private func openInputMonitoringSettings() {
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent")!)
     }
 }
