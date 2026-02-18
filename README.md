@@ -60,13 +60,18 @@ ghbdtn vbh  →  привет мир
 
 ## Installation
 
-### Download (recommended)
+### Homebrew (recommended)
+
+```bash
+brew tap JarvisMaxDev/tap
+brew install --cask retyper
+```
+
+### Download DMG
 
 1. Go to [**Releases**](https://github.com/JarvisMaxDev/ReTyper/releases/latest)
 2. Download `ReTyper-macOS-universal.dmg`
 3. Open the DMG and drag **ReTyper** to Applications
-4. Launch ReTyper — it will appear in the menu bar
-5. Grant **Accessibility** and **Input Monitoring** permissions when prompted
 
 ### Build from source
 
@@ -76,6 +81,8 @@ cd ReTyper
 swift build -c release
 .build/release/ReTyper
 ```
+
+After installing, launch ReTyper — it will appear in the menu bar. Grant **Accessibility** and **Input Monitoring** permissions when prompted.
 
 ## Permissions
 
@@ -97,6 +104,10 @@ Click the layout indicator in the menu bar to access settings:
 - **Manual Switching** — choose modifier key and single/double tap
 - **Switch Only Last Word** — convert only the last typed word
 - **Active Keyboards** — pick your Latin and Cyrillic layouts
+
+## Disclaimer
+
+This app was made for personal use. You're welcome to use it, but it comes with **no warranty** of any kind. The author is **not responsible** for any issues, data loss, or other problems that may arise from using this software. Use at your own risk.
 
 ## License
 
