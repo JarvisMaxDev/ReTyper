@@ -434,7 +434,8 @@ final class PopoverViewController: NSViewController {
         let container = NSView()
         container.translatesAutoresizingMaskIntoConstraints = false
         
-        let label = NSTextField(labelWithString: "ReTyper v1.0.0")
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev"
+        let label = NSTextField(labelWithString: "ReTyper v\(version)")
         label.font = .systemFont(ofSize: 10)
         label.textColor = .tertiaryLabelColor
         label.alignment = .center

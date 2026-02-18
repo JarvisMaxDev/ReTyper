@@ -36,7 +36,7 @@
       ]
     }],
     ["@semantic-release/exec", {
-      "prepareCmd": "echo ${nextRelease.version} > .version"
+      "prepareCmd": "echo ${nextRelease.version} > .version && /usr/libexec/PlistBuddy -c 'Set :CFBundleShortVersionString ${nextRelease.version}' ReTyper.app/Contents/Info.plist && /usr/libexec/PlistBuddy -c 'Set :CFBundleVersion ${nextRelease.version}' ReTyper.app/Contents/Info.plist && cp -R ReTyper.app/Contents/Info.plist dmg_contents/ReTyper.app/Contents/Info.plist && rm -f ReTyper-macOS-universal.dmg ReTyper-macOS-universal.zip && hdiutil create -volname ReTyper -srcfolder dmg_contents -ov -format UDZO ReTyper-macOS-universal.dmg && zip -r ReTyper-macOS-universal.zip ReTyper.app"
     }]
   ],
   "tagFormat": "v${version}"
