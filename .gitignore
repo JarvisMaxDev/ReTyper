@@ -1,0 +1,26 @@
+# Swift build artifacts
+.build/
+*.o
+*.d
+*.swp
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+DerivedData/
+
+# macOS
+.DS_Store
+*.dSYM
+
+# App bundle (built binaries & code signatures)
+ReTyper.app/Contents/MacOS/
+_CodeSignature/
+
+# Logs
+/tmp/layoutswitcher.log
+
+# IDE
+.swiftpm/
+.vscode/

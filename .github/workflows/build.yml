@@ -1,0 +1,115 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build (ARM64)
+        run: swift build -c release --arch arm64 2>&1
+
+      - name: Build (x86_64)
+        run: swift build -c release --arch x86_64 2>&1
+
+      - name: Create Universal Binary
+        run: |
+          lipo -create \
+            .build/arm64-apple-macosx/release/ReTyper \
+            .build/x86_64-apple-macosx/release/ReTyper \
+            -output ReTyper-universal
+          file ReTyper-universal
+
+      - name: Create .app bundle
+        run: |
+          APP_DIR="ReTyper.app"
+          MACOS_DIR="$APP_DIR/Contents/MacOS"
+          mkdir -p "$MACOS_DIR"
+          cp ReTyper-universal "$MACOS_DIR/ReTyper"
+          codesign --force --sign - "$APP_DIR"
+
+      - name: Verify build
+        run: |
+          echo "✅ Build artifacts:"
+          ls -la ReTyper.app/Contents/MacOS/
+          file ReTyper.app/Contents/MacOS/ReTyper
+          lipo -info ReTyper.app/Contents/MacOS/ReTyper
+
+      - name: Create DMG
+        run: |
+          mkdir -p dmg_contents
+          cp -R ReTyper.app dmg_contents/
+          hdiutil create -volname "ReTyper" -srcfolder dmg_contents -ov -format UDZO ReTyper-macOS-universal.dmg
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ReTyper-macOS-universal
+          path: ReTyper-macOS-universal.dmg
+
+  release:
+    needs: build
+    runs-on: macos-14
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install semantic-release
+        run: npm install -g semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/github @semantic-release/exec conventional-changelog-conventionalcommits
+
+      - name: Build (ARM64)
+        run: swift build -c release --arch arm64 2>&1
+
+      - name: Build (x86_64)
+        run: swift build -c release --arch x86_64 2>&1
+
+      - name: Create Universal Binary
+        run: |
+          lipo -create \
+            .build/arm64-apple-macosx/release/ReTyper \
+            .build/x86_64-apple-macosx/release/ReTyper \
+            -output ReTyper-universal
+
+      - name: Create .app bundle
+        run: |
+          APP_DIR="ReTyper.app"
+          MACOS_DIR="$APP_DIR/Contents/MacOS"
+          mkdir -p "$MACOS_DIR"
+          cp ReTyper-universal "$MACOS_DIR/ReTyper"
+          codesign --force --sign - "$APP_DIR"
+
+      - name: Create DMG
+        run: |
+          mkdir -p dmg_contents
+          cp -R ReTyper.app dmg_contents/
+          hdiutil create -volname "ReTyper" -srcfolder dmg_contents -ov -format UDZO ReTyper-macOS-universal.dmg
+
+      - name: Create ZIP
+        run: zip -r ReTyper-macOS-universal.zip ReTyper.app
+
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: Jarvis
+          GIT_AUTHOR_EMAIL: jarvis.max.dev@proton.me
+          GIT_COMMITTER_NAME: Jarvis
+          GIT_COMMITTER_EMAIL: jarvis.max.dev@proton.me
+        run: npx semantic-release
