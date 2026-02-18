@@ -84,6 +84,15 @@ swift build -c release
 
 After installing, launch ReTyper — it will appear in the menu bar. Grant **Accessibility** and **Input Monitoring** permissions when prompted.
 
+> [!NOTE]
+> **"ReTyper is damaged and can't be opened"** — this happens because the app is not signed with an Apple Developer certificate. Fix it with:
+>
+> ```bash
+> xattr -cr /Applications/ReTyper.app
+> ```
+>
+> Then open the app again.
+
 ## Permissions
 
 ReTyper needs two macOS permissions to function:
