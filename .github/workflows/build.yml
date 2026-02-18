@@ -12,6 +12,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Import Code Signing Certificate
+        env:
+          CERTIFICATE_P12: ${{ secrets.CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+        run: |
+          echo "$CERTIFICATE_P12" | base64 --decode > /tmp/cert.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import /tmp/cert.p12 -k build.keychain -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+          security add-trusted-cert -d -r trustRoot -p codeSign -k build.keychain /tmp/cert.p12 2>/dev/null || true
+          rm /tmp/cert.p12
+
       - name: Build (ARM64)
         run: swift build -c release --arch arm64 2>&1
 
@@ -32,7 +46,7 @@ jobs:
           MACOS_DIR="$APP_DIR/Contents/MacOS"
           mkdir -p "$MACOS_DIR"
           cp ReTyper-universal "$MACOS_DIR/ReTyper"
-          codesign --force --sign - "$APP_DIR"
+          codesign --force --sign "ReTyper Dev" "$APP_DIR"
 
       - name: Verify build
         run: |
@@ -67,6 +81,19 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Import Code Signing Certificate
+        env:
+          CERTIFICATE_P12: ${{ secrets.CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+        run: |
+          echo "$CERTIFICATE_P12" | base64 --decode > /tmp/cert.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import /tmp/cert.p12 -k build.keychain -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+          rm /tmp/cert.p12
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -94,7 +121,7 @@ jobs:
           MACOS_DIR="$APP_DIR/Contents/MacOS"
           mkdir -p "$MACOS_DIR"
           cp ReTyper-universal "$MACOS_DIR/ReTyper"
-          codesign --force --sign - "$APP_DIR"
+          codesign --force --sign "ReTyper Dev" "$APP_DIR"
 
       - name: Create DMG
         run: |
