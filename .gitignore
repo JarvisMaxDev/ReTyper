@@ -21,6 +21,12 @@ _CodeSignature/
 # Logs
 /tmp/layoutswitcher.log
 
+# Build artifacts
+*.dmg
+*.zip
+ReTyper-universal
+dmg_contents/
+
 # IDE
 .swiftpm/
 .vscode/
