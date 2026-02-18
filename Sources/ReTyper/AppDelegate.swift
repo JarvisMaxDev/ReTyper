@@ -8,12 +8,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let layoutManager = LayoutManager()
     private let settings = SettingsManager.shared
     
+    private var retryTimer: Timer?
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
         let log = Logger.shared
         log.log("🚀 ReTyper starting...")
         
-        // Check accessibility permissions (silent check first, prompt only if needed)
-        checkAccessibility()
+        // Request Accessibility permission (auto-adds app to Accessibility list)
+        requestAccessibility()
         
         // Initialize components
         statusBarController = StatusBarController()
@@ -29,8 +31,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSApplication.shared.terminate(nil)
         }
         
-        // Start monitoring keyboard
+        // Start monitoring keyboard (will trigger Input Monitoring prompt)
         keyboardMonitor.start()
+        
+        // If monitor didn't start, prompt for Input Monitoring and retry
+        if !keyboardMonitor.isRunning {
+            promptInputMonitoring()
+            startRetryTimer()
+        }
         
         // Start observing layout changes
         layoutManager.startObserving()
@@ -211,34 +219,61 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    // MARK: - Accessibility
+    // MARK: - Permissions
     
-    private func checkAccessibility() {
+    /// Request Accessibility permission — this auto-adds the app to the Accessibility list
+    private func requestAccessibility() {
         let log = Logger.shared
         
-        // First, check silently WITHOUT prompting
-        let silentOptions = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): false] as CFDictionary
-        let trusted = AXIsProcessTrustedWithOptions(silentOptions)
+        // Check with prompt: this BOTH checks AND adds the app to the Accessibility list
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
+        let trusted = AXIsProcessTrustedWithOptions(options)
         
         if trusted {
             log.log("✅ Accessibility permissions already granted")
-            return
+        } else {
+            log.log("⚠️ Accessibility permissions requested — user needs to enable in System Settings")
         }
+    }
+    
+    /// Show a dialog directing the user to Input Monitoring settings
+    private func promptInputMonitoring() {
+        let log = Logger.shared
+        log.log("⚠️ Input Monitoring not available — prompting user")
         
-        log.log("⚠️ Accessibility permissions not granted, prompting user...")
-        
-        // Not trusted — show alert and prompt
         DispatchQueue.main.async {
             let alert = NSAlert()
-            alert.messageText = "Accessibility Permission Required"
-            alert.informativeText = "ReTyper needs Accessibility permission to monitor keyboard input and convert text.\n\nPlease go to:\nSystem Settings → Privacy & Security → Accessibility\n\nand enable ReTyper."
+            alert.messageText = "Input Monitoring Required"
+            alert.informativeText = "ReTyper needs Input Monitoring permission to detect keyboard input.\n\nPlease go to:\nSystem Settings → Privacy & Security → Input Monitoring\n\nand enable ReTyper."
             alert.alertStyle = .warning
             alert.addButton(withTitle: "Open System Settings")
-            alert.addButton(withTitle: "Continue Anyway")
+            alert.addButton(withTitle: "Later")
             
             let response = alert.runModal()
             if response == .alertFirstButtonReturn {
-                NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+                NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent")!)
+            }
+        }
+    }
+    
+    /// Retry starting the keyboard monitor every 3 seconds until it succeeds
+    private func startRetryTimer() {
+        retryTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] timer in
+            guard let self = self else { timer.invalidate(); return }
+            
+            if self.keyboardMonitor.isRunning {
+                timer.invalidate()
+                self.retryTimer = nil
+                return
+            }
+            
+            Logger.shared.log("🔄 Retrying keyboard monitor start...")
+            self.keyboardMonitor.start()
+            
+            if self.keyboardMonitor.isRunning {
+                Logger.shared.log("✅ Keyboard monitor started successfully!")
+                timer.invalidate()
+                self.retryTimer = nil
             }
         }
     }
