@@ -106,6 +106,7 @@ jobs:
         run: zip -r ReTyper-macOS-universal.zip ReTyper.app
 
       - name: Semantic Release
+        id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIT_AUTHOR_NAME: Jarvis
@@ -113,3 +114,41 @@ jobs:
           GIT_COMMITTER_NAME: Jarvis
           GIT_COMMITTER_EMAIL: jarvis.max.dev@proton.me
         run: npx semantic-release
+
+      - name: Update Homebrew Cask
+        if: hashFiles('.version') != ''
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        run: |
+          VERSION=$(cat .version)
+          SHA256=$(shasum -a 256 ReTyper-macOS-universal.dmg | awk '{print $1}')
+          echo "Updating Cask to v${VERSION} (sha256: ${SHA256})"
+
+          git clone https://${TAP_TOKEN}@github.com/JarvisMaxDev/homebrew-tap.git /tmp/tap
+          cd /tmp/tap
+
+          cat > Casks/retyper.rb << EOF
+          cask "retyper" do
+            version "${VERSION}"
+            sha256 "${SHA256}"
+
+            url "https://github.com/JarvisMaxDev/ReTyper/releases/download/v#{version}/ReTyper-macOS-universal.dmg"
+            name "ReTyper"
+            desc "macOS keyboard layout switcher — convert mistyped text between Latin and Cyrillic"
+            homepage "https://github.com/JarvisMaxDev/ReTyper"
+
+            depends_on macos: ">= :ventura"
+
+            app "ReTyper.app"
+
+            zap trash: [
+              "~/Library/Preferences/com.retyper.app.plist",
+            ]
+          end
+          EOF
+
+          git config user.name "Jarvis"
+          git config user.email "jarvis.max.dev@proton.me"
+          git add Casks/retyper.rb
+          git commit -m "chore: update ReTyper cask to v${VERSION}"
+          git push
