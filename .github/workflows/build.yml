@@ -46,6 +46,7 @@ jobs:
           MACOS_DIR="$APP_DIR/Contents/MacOS"
           mkdir -p "$MACOS_DIR"
           cp ReTyper-universal "$MACOS_DIR/ReTyper"
+          git checkout HEAD -- ReTyper.app/Contents/Info.plist
           codesign --force --sign "ReTyper Dev" "$APP_DIR"
 
       - name: Verify build
@@ -121,6 +122,7 @@ jobs:
           MACOS_DIR="$APP_DIR/Contents/MacOS"
           mkdir -p "$MACOS_DIR"
           cp ReTyper-universal "$MACOS_DIR/ReTyper"
+          git checkout HEAD -- ReTyper.app/Contents/Info.plist
           codesign --force --sign "ReTyper Dev" "$APP_DIR"
 
       - name: Create DMG
