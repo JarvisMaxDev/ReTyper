@@ -1,12 +1,13 @@
 import Foundation
 
 /// Static character mapping tables for converting between Latin (QWERTY) and Cyrillic keyboard layouts.
-/// Covers Russian, Ukrainian, and Belarusian Apple keyboard layouts.
+/// Covers Russian, Ukrainian, and Belarusian Apple & PC keyboard layouts.
+/// Each layout has a complete mapping including letters, punctuation, and Shift+number symbols.
 struct CharacterMap {
     
-    // MARK: - Russian (ЙЦУКЕН)
+    // MARK: - Russian Apple (ЙЦУКЕН)
     
-    /// QWERTY → Russian ЙЦУКЕН mapping (lowercase + uppercase + special chars)
+    /// QWERTY → Russian ЙЦУКЕН (Apple) mapping (lowercase + uppercase + special chars)
     static let englishToRussian: [Character: Character] = [
         // Lowercase letters
         "q": "й", "w": "ц", "e": "у", "r": "к", "t": "е",
@@ -29,7 +30,7 @@ struct CharacterMap {
         "~": "Ё",
     ]
     
-    /// Russian ЙЦУКЕН → QWERTY mapping (reverse of above)
+    /// Russian Apple ЙЦУКЕН → QWERTY mapping (reverse)
     static let russianToEnglish: [Character: Character] = {
         var map: [Character: Character] = [:]
         for (en, ru) in englishToRussian {
@@ -38,11 +39,68 @@ struct CharacterMap {
         return map
     }()
     
-    // MARK: - Ukrainian (ЙЦУКЕН-UA)
+    // MARK: - Russian PC (Windows-style ЙЦУКЕН)
     
-    /// QWERTY → Ukrainian mapping
-    /// Ukrainian layout differs from Russian in several keys:
-    /// - ґ, є, і, ї replace some Russian characters
+    /// QWERTY → Russian PC mapping.
+    /// Key differences from Apple Russian:
+    /// - Period (.) and comma (,) on dedicated keys (/ and Shift+/) in bottom-right
+    /// - Number row Shift symbols: ! " № ; % : ? * ( )
+    /// - Backtick/tilde area: ё/Ё mapped same as Apple
+    static let englishToRussianPC: [Character: Character] = [
+        // Lowercase letters (same as Apple Russian)
+        "q": "й", "w": "ц", "e": "у", "r": "к", "t": "е",
+        "y": "н", "u": "г", "i": "ш", "o": "щ", "p": "з",
+        "[": "х", "]": "ъ",
+        "a": "ф", "s": "ы", "d": "в", "f": "а", "g": "п",
+        "h": "р", "j": "о", "k": "л", "l": "д", ";": "ж", "'": "э",
+        "z": "я", "x": "ч", "c": "с", "v": "м", "b": "и",
+        "n": "т", "m": "ь", ",": "б", ".": "ю",
+        "`": "ё",
+        
+        // PC-specific punctuation: / key → . (period), Shift+/ → , (comma)
+        "/": ".",
+        
+        // Uppercase letters (same as Apple Russian)
+        "Q": "Й", "W": "Ц", "E": "У", "R": "К", "T": "Е",
+        "Y": "Н", "U": "Г", "I": "Ш", "O": "Щ", "P": "З",
+        "{": "Х", "}": "Ъ",
+        "A": "Ф", "S": "Ы", "D": "В", "F": "А", "G": "П",
+        "H": "Р", "J": "О", "K": "Л", "L": "Д",
+        "Z": "Я", "X": "Ч", "C": "С", "V": "М", "B": "И",
+        "N": "Т", "M": "Ь", "<": "Б", ">": "Ю",
+        "~": "Ё",
+        
+        // PC number row Shift symbols
+        // Shift+1=! Shift+2=" Shift+3=№ Shift+4=; Shift+5=% Shift+6=: Shift+7=? Shift+8=* Shift+9=( Shift+0=)
+        "!": "!",   // Shift+1 → ! (same in both layouts)
+        "@": "\"",  // Shift+2 → " (quotes)
+        "#": "№",  // Shift+3 → № (number sign)
+        "$": ";",  // Shift+4 → ; (semicolon)
+        "%": "%",  // Shift+5 → % (same)
+        "^": ":",  // Shift+6 → : (colon)
+        "&": "?",  // Shift+7 → ? (question mark)
+        "*": "*",  // Shift+8 → * (same)
+        "(": "(",  // Shift+9 → ( (same)
+        ")": ")",  // Shift+0 → ) (same)
+        
+        // PC Shift+punctuation
+        ":": "Ж", "\"": "Э",
+        "?": ",",  // Shift+/ → , (comma) in Russian PC
+    ]
+    
+    /// Russian PC → QWERTY mapping (reverse)
+    static let russianPCToEnglish: [Character: Character] = {
+        var map: [Character: Character] = [:]
+        for (en, ru) in englishToRussianPC {
+            map[ru] = en
+        }
+        return map
+    }()
+    
+    // MARK: - Ukrainian Apple (ЙЦУКЕН-UA)
+    
+    /// QWERTY → Ukrainian Apple mapping
+    /// Differs from Russian: ґ, є, і, ї replace some characters
     static let englishToUkrainian: [Character: Character] = [
         // Lowercase letters
         "q": "й", "w": "ц", "e": "у", "r": "к", "t": "е",
@@ -68,6 +126,52 @@ struct CharacterMap {
     static let ukrainianToEnglish: [Character: Character] = {
         var map: [Character: Character] = [:]
         for (en, ua) in englishToUkrainian {
+            map[ua] = en
+        }
+        return map
+    }()
+    
+    // MARK: - Ukrainian PC (Windows-style)
+    
+    /// QWERTY → Ukrainian PC mapping.
+    /// Same letter positions as Apple Ukrainian but with PC-style punctuation.
+    static let englishToUkrainianPC: [Character: Character] = [
+        // Lowercase letters (same as Apple Ukrainian)
+        "q": "й", "w": "ц", "e": "у", "r": "к", "t": "е",
+        "y": "н", "u": "г", "i": "ш", "o": "щ", "p": "з",
+        "[": "х", "]": "ї",
+        "a": "ф", "s": "і", "d": "в", "f": "а", "g": "п",
+        "h": "р", "j": "о", "k": "л", "l": "д", ";": "ж", "'": "є",
+        "z": "я", "x": "ч", "c": "с", "v": "м", "b": "и",
+        "n": "т", "m": "ь", ",": "б", ".": "ю",
+        "`": "ґ",
+        
+        // PC-specific punctuation
+        "/": ".",
+        
+        // Uppercase letters (same as Apple Ukrainian)
+        "Q": "Й", "W": "Ц", "E": "У", "R": "К", "T": "Е",
+        "Y": "Н", "U": "Г", "I": "Ш", "O": "Щ", "P": "З",
+        "{": "Х", "}": "Ї",
+        "A": "Ф", "S": "І", "D": "В", "F": "А", "G": "П",
+        "H": "Р", "J": "О", "K": "Л", "L": "Д",
+        "Z": "Я", "X": "Ч", "C": "С", "V": "М", "B": "И",
+        "N": "Т", "M": "Ь", "<": "Б", ">": "Ю",
+        "~": "Ґ",
+        
+        // PC number row Shift symbols (same as Russian PC)
+        "!": "!", "@": "\"", "#": "№", "$": ";",
+        "%": "%", "^": ":", "&": "?", "*": "*",
+        "(": "(", ")": ")",
+        
+        // PC Shift+punctuation
+        ":": "Ж", "\"": "Є",
+        "?": ",",
+    ]
+    
+    static let ukrainianPCToEnglish: [Character: Character] = {
+        var map: [Character: Character] = [:]
+        for (en, ua) in englishToUkrainianPC {
             map[ua] = en
         }
         return map
@@ -127,16 +231,20 @@ struct CharacterMap {
         
         var toEnglishMap: [Character: Character] {
             switch self {
-            case .russian, .russianPC: return russianToEnglish
-            case .ukrainian, .ukrainianPC: return ukrainianToEnglish
+            case .russian: return russianToEnglish
+            case .russianPC: return russianPCToEnglish
+            case .ukrainian: return ukrainianToEnglish
+            case .ukrainianPC: return ukrainianPCToEnglish
             case .belarusian: return belarusianToEnglish
             }
         }
         
         var fromEnglishMap: [Character: Character] {
             switch self {
-            case .russian, .russianPC: return englishToRussian
-            case .ukrainian, .ukrainianPC: return englishToUkrainian
+            case .russian: return englishToRussian
+            case .russianPC: return englishToRussianPC
+            case .ukrainian: return englishToUkrainian
+            case .ukrainianPC: return englishToUkrainianPC
             case .belarusian: return englishToBelarusian
             }
         }

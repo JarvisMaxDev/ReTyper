@@ -5,7 +5,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     
     private var statusBarController: StatusBarController!
     private var keyboardMonitor: KeyboardMonitor!
-    private let layoutManager = LayoutManager()
+    private let layoutManager = LayoutManager.shared
     private let settings = SettingsManager.shared
     
     private var retryTimer: Timer?
@@ -83,15 +83,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             monitor.isSendingEvents = true
             monitor.simulateKeyPress(keyCode: 8, flags: .maskCommand)  // Cmd+C
             monitor.isSendingEvents = false
-            Thread.sleep(forTimeInterval: 0.15)  // 150ms
+            
+            // Poll pasteboard instead of fixed sleep
+            let clipboardChanged = self.waitForPasteboardChange(from: savedChangeCount, timeoutMs: 300)
             
             var textToConvert: String?
             var wasAlreadySelected = false
             
-            DispatchQueue.main.sync {
-                let pasteboard = NSPasteboard.general
-                if pasteboard.changeCount != savedChangeCount {
-                    textToConvert = pasteboard.string(forType: .string)
+            if clipboardChanged {
+                DispatchQueue.main.sync {
+                    textToConvert = NSPasteboard.general.string(forType: .string)
                     wasAlreadySelected = true
                     log.log("   📋 Got selected text (\(textToConvert?.count ?? 0) chars): \"\(textToConvert ?? "nil")\"")
                 }
@@ -109,12 +110,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     monitor.simulateKeyPress(keyCode: 123, flags: [.maskShift, .maskCommand])
                 }
                 
-                Thread.sleep(forTimeInterval: 0.1)  // 100ms
+                usleep(100_000)  // 100ms for selection to take effect
                 
                 // Copy the selection
+                var preChangeCount: Int = 0
+                DispatchQueue.main.sync {
+                    preChangeCount = NSPasteboard.general.changeCount
+                }
+                
                 monitor.simulateKeyPress(keyCode: 8, flags: .maskCommand)  // Cmd+C
                 monitor.isSendingEvents = false
-                Thread.sleep(forTimeInterval: 0.15)  // 150ms
+                
+                // Poll pasteboard
+                _ = self.waitForPasteboardChange(from: preChangeCount, timeoutMs: 300)
                 
                 DispatchQueue.main.sync {
                     textToConvert = NSPasteboard.general.string(forType: .string)
@@ -158,7 +166,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             monitor.isSendingEvents = true
             monitor.simulateKeyPress(keyCode: 51, flags: [])  // Delete/Backspace
             monitor.isSendingEvents = false
-            Thread.sleep(forTimeInterval: 0.05)
+            usleep(50_000)  // 50ms
             
             // === Step 5: Set clipboard and paste ===
             DispatchQueue.main.sync {
@@ -166,12 +174,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 pasteboard.clearContents()
                 pasteboard.setString(result.converted, forType: .string)
             }
-            Thread.sleep(forTimeInterval: 0.05)
+            usleep(50_000)  // 50ms
             
             monitor.isSendingEvents = true
             monitor.simulateKeyPress(keyCode: 9, flags: .maskCommand)  // Cmd+V
             monitor.isSendingEvents = false
-            Thread.sleep(forTimeInterval: 0.1)
+            usleep(100_000)  // 100ms
             
             // === Step 6: Switch layout and update UI ===
             DispatchQueue.main.sync {
@@ -184,12 +192,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             log.log("   ✅ Done! Pasted \(result.converted.count) chars, switched to: \(targetLayoutID)")
             
             // === Step 7: Restore clipboard ===
-            Thread.sleep(forTimeInterval: 0.5)
+            usleep(500_000)  // 500ms
             DispatchQueue.main.sync {
                 self.restoreClipboard(savedItems)
                 log.log("   📋 Clipboard restored")
             }
         }
+    }
+    
+    /// Poll pasteboard.changeCount until it differs from `fromCount`, or timeout.
+    /// Returns true if the change was detected.
+    private func waitForPasteboardChange(from fromCount: Int, timeoutMs: Int) -> Bool {
+        let pollIntervalUs: useconds_t = 10_000  // 10ms
+        let maxIterations = timeoutMs / 10
+        
+        for _ in 0..<maxIterations {
+            usleep(pollIntervalUs)
+            var currentCount: Int = 0
+            DispatchQueue.main.sync {
+                currentCount = NSPasteboard.general.changeCount
+            }
+            if currentCount != fromCount {
+                return true
+            }
+        }
+        return false
     }
     
     /// Save all clipboard items

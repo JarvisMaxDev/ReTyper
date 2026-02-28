@@ -6,7 +6,7 @@ import Carbon
 final class PopoverViewController: NSViewController {
     
     private let settings = SettingsManager.shared
-    private let layoutManager = LayoutManager()
+    private let layoutManager = LayoutManager.shared
     
     var onQuit: (() -> Void)?
     
@@ -41,45 +41,68 @@ final class PopoverViewController: NSViewController {
             stack.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
         
-        // === Section 1: General ===
-        stack.addArrangedSubview(makeToggleRow(
-            title: "Autostart After Login",
-            isOn: settings.autostartAfterLogin,
-            action: #selector(toggleAutostart(_:))
-        ))
-        stack.addArrangedSubview(makeToggleRow(
-            title: "Play Switching Sound",
-            isOn: settings.playSwitchingSound,
-            action: #selector(toggleSound(_:))
-        ))
-        
-        stack.addArrangedSubview(makeSeparator())
-        
-        // === Section 2: Switching ===
-        stack.addArrangedSubview(makeHotkeyRow())
-        stack.addArrangedSubview(makeToggleRow(
-            title: "Switch Only Last Word",
-            isOn: settings.switchOnlyLastWord,
-            action: #selector(toggleLastWord(_:))
-        ))
-        stack.addArrangedSubview(makeActiveKeyboardsRow())
-        
-        stack.addArrangedSubview(makeSeparator())
-        
-        // === Permissions ===
-        stack.addArrangedSubview(makePermissionStatusRow())
-        
-        stack.addArrangedSubview(makeSeparator())
-        
-        // === Footer ===
-        stack.addArrangedSubview(makeQuitRow())
-        stack.addArrangedSubview(makeVersionLabel())
+        // Add all sections
+        for section in [
+            buildGeneralSection(),
+            buildSwitchingSection(),
+            buildPermissionsSection(),
+            buildFooterSection(),
+        ] {
+            for view in section {
+                stack.addArrangedSubview(view)
+            }
+        }
         
         // Calculate height
         stack.layoutSubtreeIfNeeded()
         let height = stack.fittingSize.height
         self.preferredContentSize = NSSize(width: 340, height: height)
         view.frame = NSRect(x: 0, y: 0, width: 340, height: height)
+    }
+    
+    // MARK: - Section Builders
+    
+    private func buildGeneralSection() -> [NSView] {
+        return [
+            makeToggleRow(
+                title: "Autostart After Login",
+                isOn: settings.autostartAfterLogin,
+                action: #selector(toggleAutostart(_:))
+            ),
+            makeToggleRow(
+                title: "Play Switching Sound",
+                isOn: settings.playSwitchingSound,
+                action: #selector(toggleSound(_:))
+            ),
+            makeSeparator(),
+        ]
+    }
+    
+    private func buildSwitchingSection() -> [NSView] {
+        return [
+            makeHotkeyRow(),
+            makeToggleRow(
+                title: "Switch Only Last Word",
+                isOn: settings.switchOnlyLastWord,
+                action: #selector(toggleLastWord(_:))
+            ),
+            makeActiveKeyboardsRow(),
+            makeSeparator(),
+        ]
+    }
+    
+    private func buildPermissionsSection() -> [NSView] {
+        return [
+            makePermissionStatusRow(),
+            makeSeparator(),
+        ]
+    }
+    
+    private func buildFooterSection() -> [NSView] {
+        return [
+            makeQuitRow(),
+            makeVersionLabel(),
+        ]
     }
     
     // MARK: - Row Builders

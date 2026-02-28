@@ -5,7 +5,7 @@ final class StatusBarController {
     
     private var statusItem: NSStatusItem
     private let popover = NSPopover()
-    private let layoutManager = LayoutManager()
+    private let layoutManager = LayoutManager.shared
     private let popoverVC: PopoverViewController
     
     var onQuit: (() -> Void)?
