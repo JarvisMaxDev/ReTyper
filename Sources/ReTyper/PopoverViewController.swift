@@ -458,10 +458,14 @@ final class PopoverViewController: NSViewController {
         container.translatesAutoresizingMaskIntoConstraints = false
         
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev"
+        
         let label = NSTextField(labelWithString: "ReTyper v\(version)")
         label.font = .systemFont(ofSize: 10)
-        label.textColor = .tertiaryLabelColor
+        label.textColor = .linkColor
         label.alignment = .center
+        
+        let clickGesture = NSClickGestureRecognizer(target: self, action: #selector(openReleasesPage))
+        label.addGestureRecognizer(clickGesture)
         label.translatesAutoresizingMaskIntoConstraints = false
         
         container.addSubview(label)
@@ -591,5 +595,9 @@ final class PopoverViewController: NSViewController {
     
     @objc private func openInputMonitoringSettings() {
         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent")!)
+    }
+    
+    @objc private func openReleasesPage() {
+        NSWorkspace.shared.open(URL(string: "https://github.com/JarvisMaxDev/ReTyper/releases/latest")!)
     }
 }
