@@ -28,9 +28,13 @@ jobs:
 
       - name: Build (ARM64)
         run: swift build -c release --arch arm64 2>&1
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '13.0'
 
       - name: Build (x86_64)
         run: swift build -c release --arch x86_64 2>&1
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '13.0'
 
       - name: Create Universal Binary
         run: |
@@ -105,9 +109,13 @@ jobs:
 
       - name: Build (ARM64)
         run: swift build -c release --arch arm64 2>&1
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '13.0'
 
       - name: Build (x86_64)
         run: swift build -c release --arch x86_64 2>&1
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '13.0'
 
       - name: Create Universal Binary
         run: |
