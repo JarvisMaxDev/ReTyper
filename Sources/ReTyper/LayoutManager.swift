@@ -4,6 +4,8 @@ import Carbon
 /// Manages keyboard input sources (layouts) using the TIS API.
 final class LayoutManager {
     
+    static let shared = LayoutManager()
+    
     /// Notification posted when the layout changes
     static let layoutChangedNotification = Notification.Name("LayoutManagerLayoutChanged")
     

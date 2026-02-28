@@ -14,6 +14,7 @@ swift build
 echo "📦 Creating .app bundle..."
 mkdir -p "$MACOS_DIR"
 cp .build/debug/ReTyper "$MACOS_DIR/ReTyper"
+cp "$APP_DIR/Contents/Info.plist" "$CONTENTS_DIR/Info.plist" 2>/dev/null || true
 
 echo "🔏 Code-signing..."
 codesign --force --sign - "$APP_DIR"
@@ -25,3 +26,4 @@ echo "  open $APP_DIR"
 echo ""
 echo "Or to run from terminal:"
 echo "  $MACOS_DIR/ReTyper"
+

@@ -14,6 +14,11 @@ let package = Package(
                 .linkedFramework("Carbon"),
                 .linkedFramework("Cocoa"),
             ]
-        )
+        ),
+        .testTarget(
+            name: "ReTyperTests",
+            dependencies: ["ReTyper"],
+            path: "Tests/ReTyperTests"
+        ),
     ]
 )
