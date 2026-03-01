@@ -148,8 +148,8 @@ final class SettingsManager {
     // MARK: - Login Item
     
     private func updateLoginItem(enabled: Bool) {
-        // For macOS 13+, use SMAppService
         if #available(macOS 13.0, *) {
+            // macOS 13+: use SMAppService
             do {
                 if enabled {
                     try SMAppService.mainApp.register()
@@ -157,8 +157,45 @@ final class SettingsManager {
                     try SMAppService.mainApp.unregister()
                 }
             } catch {
-                print("Failed to update login item: \(error)")
+                Logger.shared.log("Failed to update login item via SMAppService: \(error)")
             }
+        } else {
+            // macOS 12: fallback to LaunchAgent plist
+            updateLoginItemLegacy(enabled: enabled)
+        }
+    }
+    
+    private func updateLoginItemLegacy(enabled: Bool) {
+        let agentLabel = "com.retyper.app"
+        let launchAgentsDir = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/LaunchAgents")
+        let plistPath = launchAgentsDir.appendingPathComponent("\(agentLabel).plist")
+        
+        if enabled {
+            // Find the app executable path
+            guard let executablePath = Bundle.main.executablePath else {
+                Logger.shared.log("Cannot determine executable path for LaunchAgent")
+                return
+            }
+            
+            let plistContent: [String: Any] = [
+                "Label": agentLabel,
+                "ProgramArguments": [executablePath],
+                "RunAtLoad": true,
+                "KeepAlive": false,
+            ]
+            
+            do {
+                try FileManager.default.createDirectory(at: launchAgentsDir, withIntermediateDirectories: true)
+                let data = try PropertyListSerialization.data(fromPropertyList: plistContent, format: .xml, options: 0)
+                try data.write(to: plistPath)
+                Logger.shared.log("LaunchAgent created at \(plistPath.path)")
+            } catch {
+                Logger.shared.log("Failed to create LaunchAgent: \(error)")
+            }
+        } else {
+            try? FileManager.default.removeItem(at: plistPath)
+            Logger.shared.log("LaunchAgent removed")
         }
     }
     
