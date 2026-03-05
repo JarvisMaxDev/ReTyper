@@ -49,9 +49,11 @@ jobs:
         run: |
           APP_DIR="ReTyper.app"
           MACOS_DIR="$APP_DIR/Contents/MacOS"
-          mkdir -p "$MACOS_DIR"
+          RESOURCES_DIR="$APP_DIR/Contents/Resources"
+          mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
           cp ReTyper-universal "$MACOS_DIR/ReTyper"
           git checkout HEAD -- ReTyper.app/Contents/Info.plist
+          git checkout HEAD -- ReTyper.app/Contents/Resources/AppIcon.icns
           codesign --force --sign "ReTyper Dev" "$APP_DIR"
 
       - name: Verify build
@@ -129,9 +131,11 @@ jobs:
         run: |
           APP_DIR="ReTyper.app"
           MACOS_DIR="$APP_DIR/Contents/MacOS"
-          mkdir -p "$MACOS_DIR"
+          RESOURCES_DIR="$APP_DIR/Contents/Resources"
+          mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
           cp ReTyper-universal "$MACOS_DIR/ReTyper"
           git checkout HEAD -- ReTyper.app/Contents/Info.plist
+          git checkout HEAD -- ReTyper.app/Contents/Resources/AppIcon.icns
           codesign --force --sign "ReTyper Dev" "$APP_DIR"
 
       - name: Create DMG
