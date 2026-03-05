@@ -16,6 +16,11 @@ mkdir -p "$MACOS_DIR"
 cp .build/debug/ReTyper "$MACOS_DIR/ReTyper"
 cp "$APP_DIR/Contents/Info.plist" "$CONTENTS_DIR/Info.plist" 2>/dev/null || true
 
+echo "🎨 Copying resources..."
+RESOURCES_DIR="$CONTENTS_DIR/Resources"
+mkdir -p "$RESOURCES_DIR"
+cp "$APP_DIR/Contents/Resources/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns" 2>/dev/null || true
+
 echo "🔏 Code-signing..."
 codesign --force --sign - "$APP_DIR"
 
