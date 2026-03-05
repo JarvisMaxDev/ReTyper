@@ -183,6 +183,10 @@ jobs:
 
             app "ReTyper.app"
 
+            postflight do
+              system_command "/usr/bin/xattr", args: ["-cr", "#{appdir}/ReTyper.app"]
+            end
+
             zap trash: [
               "~/Library/Preferences/com.retyper.app.plist",
             ]
