@@ -1,50 +1,146 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: unratified scaffold -> 1.0.0
+- Modified principle: template principle 1 -> I. Локальная обработка и приватность
+- Modified principle: template principle 2 -> II. Детерминированная точность раскладок
+- Modified principle: template principle 3 -> III. Сохранность текста и буфера обмена
+- Modified principle: template principle 4 -> IV. Совместимость и нативная интеграция
+- Modified principle: template principle 5 -> V. Проверка перед релизом
+- Added section: Ограничения продукта и платформы
+- Added section: Процесс разработки и quality gates
+- Added section: Governance rules for amendments, versioning, and compliance
+- Added rule: all commit author and committer metadata must use the Jarvis identity
+- Removed sections: none
+- Follow-up TODO: redact raw user text from diagnostic logs before the next release
+- Follow-up TODO: add swift test to the CI build and release gates
+- Deferred template placeholders: none
+-->
+# ReTyper Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Локальная обработка и приватность
+ReTyper MUST обрабатывать клавиатурные события, выбранный текст, содержимое буфера обмена,
+определение письменности и конвертацию только на устройстве пользователя. Пользовательский
+текст MUST NOT передаваться по сети, в аналитику, телеметрию или сторонние процессы. Сетевые
+ссылки MAY открываться только по явному действию пользователя и MUST NOT содержать введённые
+данные. Диагностические логи MUST NOT включать исходный или преобразованный текст, содержимое
+буфера обмена, последовательности нажатий либо данные, позволяющие восстановить ввод; допустимы
+только длины, идентификаторы раскладок, переходы состояния и очищенные ошибки. Это требование
+необходимо, потому что приложение получает разрешения Accessibility и Input Monitoring и тем
+самым работает с особо чувствительными данными.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Детерминированная точность раскладок
+Каждая поддерживаемая раскладка MUST иметь явную таблицу соответствий с отдельным учётом Apple
+и PC-вариантов, регистра, пунктуации и символов с Shift. Одинаковые входной текст и упорядоченный
+набор активных раскладок MUST давать одинаковые результат и целевую раскладку. Символы без
+соответствия MUST сохраняться без изменений; если направление или совместимую целевую раскладку
+нельзя однозначно определить, исходный текст MUST остаться неизменным. Новая или изменённая
+таблица MUST сопровождаться тестами прямого преобразования, обратимости для взаимно-однозначных
+пар и явно документированных коллизий. Так ошибки раскладки не превращаются в тихое повреждение
+пользовательского текста.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Сохранность текста и буфера обмена
+Замена текста MUST запускаться только явным настроенным хоткеем и затрагивать только выделение
+либо диапазон, выбранный согласно настройке пользователя. Все элементы и типы данных буфера
+обмена MUST быть сохранены до временной записи и восстановлены после операции. До подтверждения
+валидного результата и целевой раскладки приложение MUST NOT удалять исходный текст; при сбое
+копирования, преобразования или вставки операция MUST завершаться без потери или дублирования
+данных. Синтетические события MUST быть исключены из собственного мониторинга. Изменения этого
+потока требуют ручной проверки в нескольких приложениях, поскольку модульные тесты не моделируют
+полностью поведение Accessibility, CGEvent и NSPasteboard.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Совместимость и нативная интеграция
+Поддерживаемый минимум MUST оставаться macOS 12.0 во всех метаданных сборки, упаковки и
+дистрибуции, пока изменение минимума не принято как осознанное breaking change. API новее macOS
+12 MUST быть защищены availability-проверкой и иметь рабочий fallback, когда функция заявлена для
+macOS 12; в частности, автозапуск использует SMAppService на macOS 13+ и LaunchAgent на macOS 12.
+Релиз MUST содержать Universal Binary для arm64 и x86_64. Приложение MUST запрашивать только
+разрешения, необходимые для заявленного поведения, объяснять их назначение и сохранять нативное
+поведение menu bar приложения. Это предотвращает расхождение между кодом, документацией и
+фактически устанавливаемым артефактом.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Проверка перед релизом
+Каждое изменение поведения MUST иметь автоматический regression-тест, если поведение можно
+изолировать; для системной интеграции MUST быть описан и выполнен воспроизводимый ручной сценарий.
+Перед merge или релизом MUST успешно пройти `swift test`, release-сборки для arm64 и x86_64,
+создание Universal Binary, подпись и проверка запуска свежего app bundle. Изменения UI MUST быть
+проверены в запущенном приложении на desktop и зафиксированы свежим скриншотом. Изменения
+permissions, хоткея, выбора текста, буфера обмена, автозапуска, упаковки или Homebrew-установки
+MUST дополнительно пройти соответствующий end-to-end сценарий. Релиз при провале любого
+обязательного gate запрещён; это основной барьер против потери пользовательского ввода и
+неработоспособных дистрибутивов.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Ограничения продукта и платформы
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Основной стек MUST оставаться на [Swift](https://www.swift.org/) и
+  [Swift Package Manager](https://www.swift.org/package-manager/) с нативными API
+  [macOS](https://www.apple.com/macos/). Новая runtime-зависимость требует документированного
+  обоснования, оценки приватности и явного одобрения maintainer.
+- Горячий путь CGEventTap MUST выполнять только ограниченную по времени работу. Дисковый I/O,
+  сетевые операции и длительная обработка MUST NOT выполняться в callback клавиатурного события;
+  UI и NSPasteboard MUST использовать корректный main-thread context.
+- Идентификатор bundle, ключи UserDefaults и формат пользовательских настроек MUST сохранять
+  совместимость. Несовместимое изменение MUST включать миграцию либо явно одобренный сброс данных.
+- `Package.swift`, `Info.plist`, CI, release assets, Homebrew Cask и README MUST согласованно
+  указывать минимальную версию macOS, архитектуры, версию приложения и способ установки.
+- Основная конвертация MUST работать без сети, учётной записи и внешнего сервиса. Производительность
+  MUST оставаться линейной от длины обрабатываемого текста без неограниченного накопления ввода.
+- Диагностика MUST использовать
+  [Apple unified logging](https://developer.apple.com/documentation/os/logging) с приватностью по
+  умолчанию; файловый лог допустим только без пользовательского содержимого и с определённой
+  политикой ограничения размера или очистки.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Процесс разработки и quality gates
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+1. Спецификация MUST определить пользовательский сценарий, затронутые раскладки и версии macOS,
+   требования к permissions, ожидаемые ошибки и критерии приёмки.
+2. План MUST содержать Constitution Check для приватности, сохранности текста, совместимости и
+   способов проверки. Любое исключение MUST быть записано до реализации.
+3. Для исправления дефекта сначала MUST быть создан воспроизводящий тест либо точный ручной
+   сценарий. Изменение MUST быть минимальным и не добавлять абстракции без текущего второго случая
+   использования.
+4. Изменения `CharacterMap` или `TextConverter` MUST пройти весь набор
+   [XCTest](https://developer.apple.com/documentation/xctest) через `swift test`, включая новые
+   примеры регистра, пунктуации, направления и fallback-поведения.
+5. Изменения UI или системной интеграции MUST пройти свежую локальную сборку, запуск app bundle и
+   визуальную проверку. Поток хоткея MUST быть проверен с выделенным текстом, без выделения, с
+   пустым вводом и с сохранением нескольких типов NSPasteboard.
+6. Изменения релиза MUST быть проверены в
+   [GitHub Actions](https://docs.github.com/actions), включая обе архитектуры, codesign, DMG и
+   установку. Версии выпускаются через
+   [semantic-release](https://semantic-release.gitbook.io/semantic-release/) на основании
+   [Conventional Commits](https://www.conventionalcommits.org/); ручное расхождение версий
+   запрещено.
+7. Все коммиты MUST использовать `Jarvis <jarvis.max.dev@proton.me>` как author и committer.
+   Локальная конфигурация [Git](https://git-scm.com/) и release automation MUST сохранять эту
+   identity; коммит с другим автором или committer запрещено включать в `main` или релиз.
+8. Review MUST подтвердить выполнение применимых gates и отсутствие сырого пользовательского
+   текста в логах. Merge в `main` и публикация через [Homebrew](https://brew.sh/) разрешены только
+   после этой проверки.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Эта конституция имеет приоритет над README, локальными привычками и отдельными планами. Все
+спецификации, планы, задачи, review и релизы MUST проверяться на соответствие её принципам.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Поправка MUST включать предлагаемую формулировку, причину, затронутые принципы, оценку
+совместимости и план миграции для уже выпущенного поведения. Поправка вступает в силу только после
+явного одобрения maintainer, обновления Sync Impact Report, версии и даты изменения.
+
+Версия конституции следует semantic versioning: MAJOR для удаления или несовместимого
+переопределения принципа; MINOR для нового принципа, раздела или существенного расширения
+обязательных правил; PATCH для уточнений без изменения требований. Дата ратификации сохраняется,
+а Last Amended обновляется при каждой принятой поправке.
+
+Каждый PR и каждый release review MUST фиксировать применимые проверки. Временное исключение
+должно содержать причину, область, владельца и срок устранения; исключения из локальной приватности
+и сохранности пользовательского текста для релиза запрещены. Невыполненное правило блокирует
+merge или релиз до исправления либо принятия соответствующей поправки к конституции.
+
+На момент ратификации выявлены два release-blocking несоответствия: диагностические сообщения в
+`TextConverter.swift`, `KeyboardMonitor.swift` и `AppDelegate.swift` содержат пользовательский
+текст, а workflow `.github/workflows/build.yml` не запускает `swift test`. Следующий релиз MUST
+устранить оба несоответствия и пройти свежую проверку после исправлений.
+
+**Version**: 1.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-08-12
