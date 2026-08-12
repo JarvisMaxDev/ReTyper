@@ -30,3 +30,7 @@ dmg_contents/
 # IDE
 .swiftpm/
 .vscode/
+.idea/
+
+# Spec Kit downloaded catalog cache (regenerated on demand)
+.specify/extensions/.cache/
