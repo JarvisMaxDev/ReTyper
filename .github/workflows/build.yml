@@ -154,15 +154,22 @@ jobs:
         run: npx semantic-release
 
       - name: Update Homebrew Cask
-        if: hashFiles('.version') != ''
         env:
           TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=$(cat .version)
+          if [[ -f .version ]]; then
+            VERSION=$(cat .version)
+          else
+            # Recover cask synchronization even when this run creates no new release.
+            TAG=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)
+            VERSION="${TAG#v}"
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern ReTyper-macOS-universal.dmg --clobber
+          fi
           SHA256=$(shasum -a 256 ReTyper-macOS-universal.dmg | awk '{print $1}')
           echo "Updating Cask to v${VERSION} (sha256: ${SHA256})"
 
-          git clone https://${TAP_TOKEN}@github.com/JarvisMaxDev/homebrew-tap.git /tmp/tap
+          git clone "https://x-access-token:${TAP_TOKEN}@github.com/JarvisMaxDev/homebrew-tap.git" /tmp/tap
           cd /tmp/tap
 
           cat > Casks/retyper.rb << EOF
@@ -191,6 +198,10 @@ jobs:
 
           git config user.name "Jarvis"
           git config user.email "jarvis.max.dev@proton.me"
-          git add Casks/retyper.rb
-          git commit -m "chore: update ReTyper cask to v${VERSION}"
-          git push
+          if git diff --quiet -- Casks/retyper.rb; then
+            git push --dry-run
+          else
+            git add Casks/retyper.rb
+            git commit -m "chore: update ReTyper cask to v${VERSION}"
+            git push
+          fi
