@@ -15,8 +15,8 @@
 - [X] Release-сборка arm64/x86_64, Universal Binary и минимум macOS 12.0 у обеих архитектур: build/lipo/vtool успешны.
 - [X] `scripts/test-package-release.sh`: 8/8; настоящий универсальный кандидат дополнительно упакован ad-hoc и проверен после извлечения.
 - [X] Локальная подпись проверена; извлечённый кандидат запущен, свежий source-linked UI-прогон 5/5 со снимком. Подпись CI отдельно проверяется при получении его артефакта.
-- [ ] Коммит с правильными author/committer и только предназначенными файлами; ревизия зафиксирована.
-- [ ] Успешный [GitHub Actions](https://docs.github.com/actions) на существующей ветке без публикации.
+- [X] Код зафиксирован коммитом `3f70bc4` с author/committer `Jarvis <jarvis.max.dev@proton.me>`; последующая совместимость release notes учитывается ниже.
+- [X] [CI кандидата 3f70bc4](https://github.com/JarvisMaxDev/ReTyper/actions/runs/34158204894) успешен на существующей ветке; release job пропущен. После правки release notes кандидат проверяется снова перед main.
 - [ ] Перенос готового кандидата в `main`, успешный обязательный build и публичный release pipeline.
 - [ ] Проверка опубликованных DMG/ZIP, версий, архитектур, подписей и обновления [Homebrew Cask](https://docs.brew.sh/Cask-Cookbook).
 
@@ -54,3 +54,12 @@ T031/T053 и прежние фактические результаты оста
 - UI-артефакты: `/var/folders/jf/96nbx4_n3ksb0p99q8_ph5xm0000gn/T/opencode/retyper-hotkey-ui.CWpPun/report-release.json` (SHA-256 `7aa302499d5a91fcca940987c78c6b8ffa27e63bfe717422a78cc3622dec3329`) и просмотренный `release-ordinary-refusal.png` (SHA-256 `41e31f3908ce3ee644582b448f0804b94bf89daa48ab0918e0843b7b26f0ba3b`).
 
 Ревизии коммитов, ссылки CI/релиза и проверки публичных архивов добавляются только после выполнения.
+
+### CI и совместимость release notes
+
+- [CI кандидата](https://github.com/JarvisMaxDev/ReTyper/actions/runs/34158204894): ревизия `3f70bc4e21757b407176cc8a93195a8be7bcbbfe`, build успешен, release пропущен по условию ветки. Подписанный DMG скачан и проверен: обе архитектуры, минимум 12.0, `codesign --verify --deep --strict --all-architectures`, Authority `ReTyper Dev`. Это существующая подпись проекта без Apple Developer TeamIdentifier, не заявление о нотариализации.
+- Извлечённый CI-кандидат из `release-check/ci/ReTyper.app` запущен 22:14:35, PID 13844; метаданные старта подтвердили сохранённый Accessibility. Предыдущий локальный кандидат PID 11761 завершён штатно.
+- После fast-forward main на `3f70bc4` [первый release workflow](https://github.com/JarvisMaxDev/ReTyper/actions/runs/34158740751) успешно выполнил build/тесты, но остановился **до prepare/tag/publish** при генерации notes. Последний опубликованный релиз остался 0.9.0; артефакты 0.9.1 этим запуском не опубликованы.
+- Причина установлена по логу и registry metadata: `@semantic-release/release-notes-generator@14.1.1` требует writer `^8`, а незакреплённый `conventional-changelog-conventionalcommits@10.4.0` требует writer 9. В workflow закреплены generator `14.1.1` и совместимый preset `9.3.1`, используемый в devDependencies генератора.
+- В отдельном временном npm-каталоге с этими двумя версиями вызван только `generateNotes` с текущим presetConfig и реальным сообщением fix-коммита. Проверены версия 0.9.1, секция Bug Fixes и текст изменения: PASS. Полный semantic-release, теги, git-push и публикация локально не запускались; глобальные npm/Node/nvm не менялись.
+- Данное исправление меняет только инструментарий notes, не Swift-код. Неуспешный workflow сохранён как неуспешный; исправленный релиз требует нового CI-прохода.
