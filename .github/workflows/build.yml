@@ -13,6 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Run unit tests
+        run: swift test
+
+      - name: Test release packaging
+        run: bash scripts/test-package-release.sh
+
       - name: Import Code Signing Certificate
         env:
           CERTIFICATE_P12: ${{ secrets.CERTIFICATE_P12 }}
@@ -105,7 +111,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24'
 
       - name: Install semantic-release
         run: npm install -g semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/github @semantic-release/exec conventional-changelog-conventionalcommits
@@ -136,16 +142,6 @@ jobs:
           cp ReTyper-universal "$MACOS_DIR/ReTyper"
           git checkout HEAD -- ReTyper.app/Contents/Info.plist
           git checkout HEAD -- ReTyper.app/Contents/Resources/AppIcon.icns
-          codesign --force --sign "ReTyper Dev" "$APP_DIR"
-
-      - name: Create DMG
-        run: |
-          mkdir -p dmg_contents
-          cp -R ReTyper.app dmg_contents/
-          hdiutil create -volname "ReTyper" -srcfolder dmg_contents -ov -format UDZO ReTyper-macOS-universal.dmg
-
-      - name: Create ZIP
-        run: zip -r ReTyper-macOS-universal.zip ReTyper.app
 
       - name: Semantic Release
         id: release
@@ -179,7 +175,7 @@ jobs:
             desc "macOS keyboard layout switcher — convert mistyped text between Latin and Cyrillic"
             homepage "https://github.com/JarvisMaxDev/ReTyper"
 
-            depends_on macos: ">= :monterey"
+            depends_on macos: :monterey
 
             app "ReTyper.app"
 

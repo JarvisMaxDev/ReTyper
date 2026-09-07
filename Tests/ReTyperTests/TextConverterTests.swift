@@ -66,6 +66,28 @@ final class TextConverterTests: XCTestCase {
         XCTAssertEqual(result.converted, "hello")
         XCTAssertEqual(result.targetLayoutID, "com.apple.keylayout.US")
     }
+
+    func testIncompatibleLatinTargetsPreserveTheOriginal() {
+        let source = "\u{440}\u{443}\u{434}\u{434}\u{449}"
+        for target in ["Arabic", "German", "French", "Dvorak", "Colemak", "British", "US-extra"] {
+            let result = TextConverter.autoConvert(source, availableLayoutIDs: [
+                "com.apple.keylayout.Russian", "com.apple.keylayout." + target
+            ])
+            XCTAssertEqual(Array(result.converted.utf16), Array(source.utf16), target)
+            XCTAssertNil(result.targetLayoutID, target)
+        }
+    }
+
+    func testSupportedLatinTargetsPreserveCallerOrderAndSkipIncompatibleTargets() {
+        let targets = ["com.apple.keylayout.US", "com.apple.keylayout.ABC", "com.apple.keylayout.PolishPro"]
+        for first in targets {
+            let layouts = ["com.apple.keylayout.Russian", "com.apple.keylayout.Dvorak", first]
+                + targets.filter { $0 != first }
+            let result = TextConverter.autoConvert("\u{440}\u{443}\u{434}\u{434}\u{449}", availableLayoutIDs: layouts)
+            XCTAssertEqual(result.converted, "hello")
+            XCTAssertEqual(result.targetLayoutID, first)
+        }
+    }
     
     // MARK: - Conversion with Punctuation
     
@@ -92,6 +114,27 @@ final class TextConverterTests: XCTestCase {
         XCTAssertEqual(result.converted, "привет")
         XCTAssertEqual(result.targetLayoutID, "com.apple.keylayout.RussianWin")
     }
+
+    func testPCIdentifiersUseTheirOwnPunctuationInBothDirections() {
+        let pairs: [(CharacterMap.CyrillicLayout, CharacterMap.CyrillicLayout)] = [
+            (.russianPC, .russian), (.ukrainianPC, .ukrainian)
+        ]
+        for (pc, apple) in pairs {
+            let layouts = ["com.apple.keylayout.US", pc.rawValue]
+            let differences = pc.fromEnglishMap.filter { apple.fromEnglishMap[$0.key] != $0.value }
+            XCTAssertFalse(differences.isEmpty)
+            for (latin, cyrillic) in differences {
+                let source = "a" + String(latin)
+                let expected = "\u{444}" + String(cyrillic)
+                let forward = TextConverter.autoConvert(source, availableLayoutIDs: layouts)
+                XCTAssertEqual(forward.converted, expected, "\(pc.rawValue): \(latin)")
+                XCTAssertEqual(forward.targetLayoutID, pc.rawValue)
+                let reverse = TextConverter.autoConvert(expected, availableLayoutIDs: layouts)
+                XCTAssertEqual(reverse.converted, source, "\(pc.rawValue): \(cyrillic)")
+                XCTAssertEqual(reverse.targetLayoutID, "com.apple.keylayout.US")
+            }
+        }
+    }
     
     // MARK: - Ukrainian
     
@@ -108,6 +151,19 @@ final class TextConverterTests: XCTestCase {
     }
     
     // MARK: - Unknown/No Conversion
+
+    func testBelarusianApostropheAlwaysReversesToTheUnshiftedBracket() {
+        let layouts = ["com.apple.keylayout.US", "com.apple.keylayout.Belarusian"]
+        let source = "\u{430}'"
+        let result = TextConverter.autoConvert(source, availableLayoutIDs: layouts)
+        XCTAssertEqual(result.converted, "f]")
+        XCTAssertEqual(result.targetLayoutID, "com.apple.keylayout.US")
+        for text in ["f]", "f}"] {
+            let forward = TextConverter.autoConvert(text, availableLayoutIDs: layouts)
+            XCTAssertEqual(forward.converted, source)
+            XCTAssertEqual(forward.targetLayoutID, "com.apple.keylayout.Belarusian")
+        }
+    }
     
     func testConvertUnknownScriptReturnsOriginal() {
         let layouts = [

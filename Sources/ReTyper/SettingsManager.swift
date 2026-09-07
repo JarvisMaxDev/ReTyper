@@ -146,6 +146,11 @@ final class SettingsManager {
     }
     
     // MARK: - Login Item
+
+    static func loginItemFailureMessage(_ error: Error, legacy: Bool) -> String {
+        let backend = legacy ? "LaunchAgent" : "SMAppService"
+        return "Login item update failed (backend=\(backend), code=\((error as NSError).code))"
+    }
     
     private func updateLoginItem(enabled: Bool) {
         if #available(macOS 13.0, *) {
@@ -157,7 +162,7 @@ final class SettingsManager {
                     try SMAppService.mainApp.unregister()
                 }
             } catch {
-                Logger.shared.log("Failed to update login item via SMAppService: \(error)")
+                Logger.shared.log(Self.loginItemFailureMessage(error, legacy: false))
             }
         } else {
             // macOS 12: fallback to LaunchAgent plist
@@ -189,9 +194,9 @@ final class SettingsManager {
                 try FileManager.default.createDirectory(at: launchAgentsDir, withIntermediateDirectories: true)
                 let data = try PropertyListSerialization.data(fromPropertyList: plistContent, format: .xml, options: 0)
                 try data.write(to: plistPath)
-                Logger.shared.log("LaunchAgent created at \(plistPath.path)")
+                Logger.shared.log("LaunchAgent created")
             } catch {
-                Logger.shared.log("Failed to create LaunchAgent: \(error)")
+                Logger.shared.log(Self.loginItemFailureMessage(error, legacy: true))
             }
         } else {
             try? FileManager.default.removeItem(at: plistPath)

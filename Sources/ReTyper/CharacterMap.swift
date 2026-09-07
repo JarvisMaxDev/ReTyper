@@ -208,6 +208,8 @@ struct CharacterMap {
         for (en, by) in englishToBelarusian {
             map[by] = en
         }
+        // Both brackets produce an apostrophe; its canonical inverse is unshifted.
+        map["'"] = "]"
         return map
     }()
     
@@ -252,17 +254,12 @@ struct CharacterMap {
     
     /// Determine if a layout ID is Cyrillic and which one
     static func cyrillicLayout(for layoutID: String) -> CyrillicLayout? {
-        return CyrillicLayout.allCases.first { layoutID.contains($0.rawValue) || $0.rawValue.contains(layoutID) }
+        return CyrillicLayout(rawValue: layoutID)
     }
     
-    /// Determine if a layout ID is a Latin-based layout (QWERTY/QWERTZ/AZERTY).
-    /// Treats any non-Cyrillic keyboard layout as Latin for conversion purposes.
+    /// Known Latin layouts for manual switching, not proof of QWERTY compatibility.
     static func isLatinLayout(_ layoutID: String) -> Bool {
-        // If it's Cyrillic, it's not Latin
-        if cyrillicLayout(for: layoutID) != nil { return false }
-        
-        // Known Latin layouts (explicit match)
-        let latinPatterns = [
+        let latinNames = [
             "ABC", "US", "British", "USInternational", "Australian",
             "Canadian", "USExtended", "Colemak", "Dvorak",
             "Polish", "PolishPro", "German", "French", "Spanish",
@@ -270,17 +267,12 @@ struct CharacterMap {
             "Danish", "Finnish", "Czech", "Slovak", "Hungarian",
             "Romanian", "Croatian", "Slovenian", "Turkish",
         ]
-        let idLower = layoutID.lowercased()
-        if latinPatterns.contains(where: { idLower.contains($0.lowercased()) }) {
-            return true
-        }
-        
-        // Fallback: if it starts with com.apple.keylayout and isn't Cyrillic, assume Latin
-        if layoutID.hasPrefix("com.apple.keylayout.") {
-            return true
-        }
-        
-        return false
+        return latinNames.contains { layoutID == "com.apple.keylayout.\($0)" }
+    }
+
+    /// Only these targets share the printable-key map used by conversion.
+    static func isSupportedLatinTarget(_ layoutID: String) -> Bool {
+        ["com.apple.keylayout.US", "com.apple.keylayout.ABC", "com.apple.keylayout.PolishPro"].contains(layoutID)
     }
     
     /// Legacy alias for compatibility

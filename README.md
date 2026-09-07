@@ -9,7 +9,7 @@
   <a href="https://github.com/JarvisMaxDev/ReTyper/releases/latest">
     <img src="https://img.shields.io/github/v/release/JarvisMaxDev/ReTyper?style=flat-square&label=Download&color=brightgreen" alt="Download latest release">
   </a>
-  <img src="https://img.shields.io/badge/platform-macOS%2013%2B-blue?style=flat-square" alt="macOS 13+">
+  <img src="https://img.shields.io/badge/platform-macOS%2012%2B-blue?style=flat-square" alt="macOS 12+">
   <img src="https://img.shields.io/badge/arch-Universal%20(ARM64%20%2B%20x86__64)-orange?style=flat-square" alt="Universal Binary">
 </p>
 
@@ -50,7 +50,7 @@ ghbdtn vbh  →  привет мир
 
 | Requirement      | Minimum                             |
 | ---------------- | ----------------------------------- |
-| **macOS**        | 13.0 (Ventura) or later             |
+| **macOS**        | 12.0 (Monterey) or later            |
 | **Architecture** | Apple Silicon (M1+) or Intel x86_64 |
 | **Disk space**   | ~5 MB                               |
 | **RAM**          | Negligible (~10 MB at runtime)      |
@@ -99,7 +99,7 @@ ReTyper needs two macOS permissions to function:
 
 | Permission           | Why                                                            |
 | -------------------- | -------------------------------------------------------------- |
-| **Accessibility**    | To read and replace selected text via Cmd+C / Cmd+V simulation |
+| **Accessibility**    | To read focused text and selection, validate the range, and send replacement input |
 | **Input Monitoring** | To detect hotkey presses (modifier key double-tap)             |
 
 Grant both in **System Settings → Privacy & Security**.
@@ -113,6 +113,20 @@ Click the layout indicator in the menu bar to access settings:
 - **Manual Switching** — choose modifier key and single/double tap
 - **Switch Only Last Word** — convert only the last typed word
 - **Active Keyboards** — pick your Latin and Cyrillic layouts
+
+## Known limitations
+
+Актуальный объём на 2026-09-06:
+
+- **В терминалах и полях без подтверждённых условий редактирования замена отменяется до отправки текста.** Полная поддержка [Terminal](https://support.apple.com/guide/terminal/welcome/mac) отложена по решению пользователя «Безопасная отмена пока». Читаемый экран и диапазон экранного выделения не доказывают положение курсора командной строки. Удаления серией Backspace и внутреннего буфера набранного текста нет.
+- **Проверки возможностей поля не означают поддержку любого приложения.** Для попытки замены нужны роль `AXTextField`, `AXTextArea` или `AXComboBox`, включённое сфокусированное поле без secure-подроли, читаемые согласованные текст и диапазон, доступные на запись `AXValue` и `AXSelectedTextRange`. Это условия допуска, а не доказательство того, как конкретное приложение обработает ввод. В допущенных редактируемых полях сохранены оба режима: последнее слово и текст от начала строки до курсора.
+- **Автоматическая замена не использует буфер обмена ни как источник, ни как транспорт.** Текст читается через [Accessibility](https://developer.apple.com/documentation/applicationservices/axuielement), а для замены готовится одна пара событий Unicode с точным локальным чтением обратно. Предел подготовки составляет 4096 единиц UTF-16; платформа может отклонить и более короткий фрагмент. Дробления на несколько вводов нет.
+- **Автоматические латинские цели ограничены US, ABC и Polish Pro**, совместимыми с имеющейся QWERTY-таблицей. Остальные раскладки могут оставаться в ручном выборе, но не получают результат по неподходящей таблице; если совместимой цели нет, исходник сохраняется. Кириллические Apple/PC-варианты определяются по точному ID. Неоднозначный белорусский апостроф при обратной конвертации всегда даёт `]` без Shift; восстановить исходное состояние Shift по тексту невозможно.
+- **Передача события процессу не подтверждает замену в поле.** Успех требует повторного чтения полного ожидаемого текста, пустого выделения и правильного курсора. Событие в очереди можно отменить, но после `handedOff` нельзя обещать атомарность поля или отзыв ввода. При неизвестном или частичном результате исходный фрагмент остаётся только в памяти, новые замены блокируются, слепой автоматический откат не выполняется. Единственное исключение: полностью подтверждённый преобразованный текст с неверным курсором допускает одну адресную попытку восстановления с проверкой, без повторов. Поздно подтверждённый полностью корректный результат считается успехом, без отката.
+- **Ручное восстановление требует явного действия.** `Copy Original Text` записывает сохранённый фрагмент в буфер обмена только по нажатию и заменяет его текущее содержимое; это единственная запись в буфер обмена. После проверки поля пользователь может подтвердить `Clear Recovery`: исходник будет удалён из памяти и новые замены разрешены, но уже переданное событие этим не отменяется. Выход ждёт текущую операцию и предупреждает о потере сохранённого исходника; после завершения процесса копия не сохраняется.
+- **Диагностика локальная и ограниченная.** `~/Library/Caches/com.retyper.app/retyper.log` содержит только метаданные, не пользовательский текст; предел файла 1 MiB, права каталога `0700`, файла `0600`. Запись вынесена из горячего пути и может пропускаться при перегрузке.
+
+Полная матрица приложений и целевых систем не заявлена проверенной. Фактические подтверждения и ограничения: [отчёт проверки](specs/001-fix-retype-text-replacement/verification.md); согласованные условия этого patch-релиза и перенесённые проверки: [release gate](specs/001-fix-retype-text-replacement/release-gate.md).
 
 ## Disclaimer
 

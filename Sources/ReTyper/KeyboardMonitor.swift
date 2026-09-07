@@ -1,288 +1,399 @@
 import Cocoa
-import Carbon
 
-/// Monitors keyboard events globally using CGEventTap.
-/// Maintains a buffer of recently typed characters and detects the double-tap hotkey.
-final class KeyboardMonitor {
-    
-    /// Shared instance for permission status checks
+/// Detects the hotkey and routes prepared input, never retaining a typed-text buffer.
+final class KeyboardMonitor: ReplacementInputProviding {
     static var shared: KeyboardMonitor?
-    
-    /// Called when the hotkey is triggered. Provides the buffered text.
-    var onHotkeyTriggered: ((String) -> Void)?
-    
-    private var eventTap: CFMachPort?
-    private var runLoopSource: CFRunLoopSource?
-    
-    /// Buffer of recently typed characters (current word)
-    private var buffer: [Character] = []
-    
-    /// For double-tap detection — track by modifier type, not exact keyCode
-    private var lastModifierReleaseTime: TimeInterval = 0
-    private var lastModifierType: SettingsManager.HotkeyModifier? = nil
-    private var modifierWasAlone = true
-    private let doubleTapThreshold: TimeInterval = 0.4
-    
-    /// Flag to suppress capturing our own simulated events
-    var isSendingEvents = false
-    
+    var onHotkeyTriggered: ((pid_t?, UInt64, TimeInterval) -> Void)?
+
+    private let gate = SyntheticInputGate(
+        clock: { ProcessInfo.processInfo.systemUptime },
+        frontmostPID: {
+            if Thread.isMainThread { return NSWorkspace.shared.frontmostApplication?.processIdentifier }
+            return DispatchQueue.main.sync { NSWorkspace.shared.frontmostApplication?.processIdentifier }
+        }
+    )
+    private let tapLock = NSLock()
+    private var sessionTap: CFMachPort?
+    private var annotatedTap: CFMachPort?
+    private var sessionSource: CFRunLoopSource?
+    private var annotatedSource: CFRunLoopSource?
+    private var activationObserver: NSObjectProtocol?
+
+    // Both taps, lifecycle changes and hotkey state use the main run loop.
+    private var stages = KeyboardEventStages()
     private let settings = SettingsManager.shared
-    
-    /// Whether the CGEventTap is running
-    var isRunning: Bool { eventTap != nil }
-    
+
+    var activityGeneration: UInt64 { gate.activityGeneration }
+
+    var isRunning: Bool {
+        let enabled = tapsEnabled
+        return enabled.session && enabled.annotated
+    }
+
+    private var tapsEnabled: (session: Bool, annotated: Bool) {
+        tapLock.lock()
+        let session = sessionTap
+        let annotated = annotatedTap
+        tapLock.unlock()
+        return (session.map { CGEvent.tapIsEnabled(tap: $0) } ?? false,
+                annotated.map { CGEvent.tapIsEnabled(tap: $0) } ?? false)
+    }
+
     init() {
         KeyboardMonitor.shared = self
     }
-    
+
+    deinit {
+        if sessionTap != nil || annotatedTap != nil {
+            precondition(Thread.isMainThread)
+            stop()
+        }
+    }
+
     // MARK: - Start / Stop
-    
+
     func start() {
-        // Event mask: keyDown + flagsChanged
-        let eventMask: CGEventMask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.flagsChanged.rawValue)
-        
-        guard let tap = CGEvent.tapCreate(
+        precondition(Thread.isMainThread)
+        guard !isRunning else { return }
+        stop()
+
+        let types: [CGEventType] = [
+            .null, .keyDown, .keyUp, .flagsChanged,
+            .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp,
+            .otherMouseDown, .otherMouseUp, .mouseMoved,
+            .leftMouseDragged, .rightMouseDragged, .otherMouseDragged, .scrollWheel
+        ]
+        let eventMask = types.reduce(CGEventMask(0)) { $0 | (CGEventMask(1) << $1.rawValue) }
+        guard let session = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
             options: .defaultTap,
             eventsOfInterest: eventMask,
-            callback: { (proxy, type, event, refcon) -> Unmanaged<CGEvent>? in
-                guard let refcon = refcon else { return Unmanaged.passRetained(event) }
+            callback: { _, type, event, refcon in
+                guard let refcon = refcon else { return Unmanaged.passUnretained(event) }
                 let monitor = Unmanaged<KeyboardMonitor>.fromOpaque(refcon).takeUnretainedValue()
-                return monitor.handleEvent(proxy: proxy, type: type, event: event)
+                return monitor.handleEvent(stage: .session, type: type, event: event)
             },
             userInfo: Unmanaged.passUnretained(self).toOpaque()
         ) else {
-            Logger.shared.log("⚠️ Failed to create CGEventTap! Grant Accessibility + Input Monitoring permissions.")
+            Logger.shared.log("Failed to create CGEventTap. Check Accessibility and Input Monitoring permissions.")
             return
         }
-        
-        self.eventTap = tap
-        let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
-        self.runLoopSource = source
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), source, .commonModes)
-        CGEvent.tapEnable(tap: tap, enable: true)
-        
-        Logger.shared.log("✅ KeyboardMonitor started (CGEventTap created successfully)")
-    }
-    
-    func stop() {
-        if let tap = eventTap {
-            CGEvent.tapEnable(tap: tap, enable: false)
-        }
-        if let source = runLoopSource {
-            CFRunLoopRemoveSource(CFRunLoopGetCurrent(), source, .commonModes)
-        }
-        eventTap = nil
-        runLoopSource = nil
-    }
-    
-    func clearBuffer() {
-        buffer.removeAll()
-    }
-    
-    var bufferContent: String {
-        return String(buffer)
-    }
-    
-    // MARK: - Event Handling
-    
-    private func handleEvent(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
-        
-        // If we're sending synthetic events, don't process them
-        if isSendingEvents {
-            return Unmanaged.passRetained(event)
-        }
-        
-        // Re-enable if the system disabled our tap
-        if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
-            if let tap = eventTap {
-                CGEvent.tapEnable(tap: tap, enable: true)
-                Logger.shared.log("🔄 CGEventTap re-enabled (was disabled by system)")
-            }
-            return Unmanaged.passRetained(event)
-        }
-        
-        if type == .flagsChanged {
-            handleFlagsChanged(event: event)
-            return Unmanaged.passRetained(event)
-        }
-        
-        if type == .keyDown {
-            handleKeyDown(event: event)
-            // Any regular key press means the modifier wasn't pressed alone
-            modifierWasAlone = false
-        }
-        
-        return Unmanaged.passRetained(event)
-    }
-    
-    private func handleKeyDown(event: CGEvent) {
-        let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
-        
-        // Backspace — remove last char
-        if keyCode == 51 {
-            if !buffer.isEmpty {
-                buffer.removeLast()
-            }
+
+        guard let annotated = CGEvent.tapCreate(
+            tap: .cgAnnotatedSessionEventTap,
+            place: .headInsertEventTap,
+            options: .defaultTap,
+            eventsOfInterest: CGEventMask(1) << CGEventType.flagsChanged.rawValue,
+            callback: { _, type, event, refcon in
+                guard let refcon = refcon else { return Unmanaged.passUnretained(event) }
+                let monitor = Unmanaged<KeyboardMonitor>.fromOpaque(refcon).takeUnretainedValue()
+                return monitor.handleEvent(stage: .annotated, type: type, event: event)
+            },
+            userInfo: Unmanaged.passUnretained(self).toOpaque()
+        ) else {
+            CFMachPortInvalidate(session)
+            Logger.shared.log("Failed to create annotated hotkey CGEventTap.")
             return
         }
-        
-        // Word-breaking keys: Space(49), Return(36), Tab(48), Escape(53)
-        if keyCode == 49 || keyCode == 36 || keyCode == 48 || keyCode == 53 {
-            clearBuffer()
+
+        guard let sessionSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, session, 0),
+              let annotatedSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, annotated, 0) else {
+            CFMachPortInvalidate(session)
+            CFMachPortInvalidate(annotated)
             return
         }
-        
-        // Get unicode character from the event
-        var length = 0
-        var chars = [UniChar](repeating: 0, count: 4)
-        event.keyboardGetUnicodeString(maxStringLength: 4, actualStringLength: &length, unicodeString: &chars)
-        
-        if length > 0 {
-            let s = String(utf16CodeUnits: chars, count: length)
-            for c in s {
-                buffer.append(c)
-            }
-        }
-        
-        if buffer.count > 200 {
-            buffer = Array(buffer.suffix(200))
-        }
-    }
-    
-    private func handleFlagsChanged(event: CGEvent) {
-        let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
-        let flags = event.flags
-        let targetModifier = settings.hotkeyModifier
-        let targetFlag = targetModifier.cgEventFlag
-        
-        guard isModifierKeyCode(keyCode, modifier: targetModifier) else { return }
-        
-        let isDown = flags.contains(targetFlag)
-        
-        if isDown {
-            modifierWasAlone = true
-        } else {
-            // Modifier released
-            guard modifierWasAlone else { return }
-            
-            if settings.doubleTapMode {
-                // Double-tap mode: need two quick taps
-                let now = ProcessInfo.processInfo.systemUptime
-                let elapsed = now - lastModifierReleaseTime
-                
-                if elapsed < doubleTapThreshold && lastModifierType == targetModifier {
-                    Logger.shared.log("🎯 Double-tap \(targetModifier.displaySymbol) detected! Buffer: \"\(bufferContent)\"")
-                    triggerHotkey()
-                    lastModifierReleaseTime = 0
-                    lastModifierType = nil
-                } else {
-                    lastModifierReleaseTime = now
-                    lastModifierType = targetModifier
-                }
+        activationObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: nil
+        ) { [weak self] _ in
+            self?.gate.recordActivity()
+            if Thread.isMainThread {
+                self?.resetHotkey()
             } else {
-                // Single-tap mode: trigger on first solo release
-                Logger.shared.log("🎯 Single-tap \(targetModifier.displaySymbol) detected! Buffer: \"\(bufferContent)\"")
-                triggerHotkey()
+                DispatchQueue.main.async { [weak self] in self?.resetHotkey() }
+            }
+        }
+        tapLock.lock()
+        sessionTap = session
+        annotatedTap = annotated
+        tapLock.unlock()
+        self.sessionSource = sessionSource
+        self.annotatedSource = annotatedSource
+        CFRunLoopAddSource(CFRunLoopGetMain(), sessionSource, .commonModes)
+        CFRunLoopAddSource(CFRunLoopGetMain(), annotatedSource, .commonModes)
+        CGEvent.tapEnable(tap: session, enable: true)
+        CGEvent.tapEnable(tap: annotated, enable: true)
+        gate.resetTap(isEnabled: isRunning)
+    }
+
+    func stop() {
+        precondition(Thread.isMainThread)
+        gate.resetTap(isEnabled: false)
+        releasePendingKeys()
+        resetHotkey()
+        tapLock.lock()
+        let taps = [sessionTap, annotatedTap].compactMap { $0 }
+        sessionTap = nil
+        annotatedTap = nil
+        tapLock.unlock()
+        for tap in taps {
+            CGEvent.tapEnable(tap: tap, enable: false)
+            CFMachPortInvalidate(tap)
+        }
+        for source in [sessionSource, annotatedSource].compactMap({ $0 }) {
+            CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes)
+        }
+        sessionSource = nil
+        annotatedSource = nil
+        if let observer = activationObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(observer)
+            activationObserver = nil
+        }
+    }
+
+    /// Kept for AppDelegate wiring; text comes only from the coordinator's AX snapshot.
+    func clearBuffer() {}
+
+    // MARK: - Prepared Input
+
+    func prepare(_ text: String, targetPID: pid_t, activationPID: pid_t, generation: UInt64,
+                 deadline: TimeInterval) -> PreparedTextInput? {
+        guard isRunning else { return nil }
+        return gate.prepare(text, targetPID: targetPID, activationPID: activationPID,
+                            generation: generation, deadline: deadline)
+    }
+
+    func send(_ input: PreparedTextInput) {
+        guard isRunning else {
+            gate.cancel(input)
+            return
+        }
+        guard let signals = gate.takeSignals(for: input) else { return }
+        // Only inert null events enter the global stream. A missing/disabled tap
+        // cannot accidentally deliver Unicode input to the current application.
+        signals.down.post(tap: .cgSessionEventTap)
+        signals.up.post(tap: .cgSessionEventTap)
+    }
+
+    func delivery(of input: PreparedTextInput) -> InputDelivery {
+        if !isRunning { return gate.cancel(input) }
+        return gate.delivery(of: input)
+    }
+
+    @discardableResult
+    func cancel(_ input: PreparedTextInput) -> InputDelivery {
+        gate.cancel(input)
+    }
+
+    func finish(_ input: PreparedTextInput) {
+        guard gate.finish(input) else { return }
+        // A queued null release may have been lost while the tap was disabled.
+        // Main-queue ordering ensures the down's postToPid call has completed.
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if case let .route(up, pid) = self.gate.handle(type: .null, token: input.id + 1) {
+                up.postToPid(pid)
             }
         }
     }
-    
-    /// Check if a keyCode is for the given modifier (left or right)
+
+    // MARK: - Event Handling
+
+    private func handleEvent(stage: KeyboardEventStages.Stage, type: CGEventType,
+                             event: CGEvent) -> Unmanaged<CGEvent>? {
+        precondition(Thread.isMainThread)
+        if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+            gate.resetTap(isEnabled: false)
+            releasePendingKeys()
+            resetHotkey()
+            tapLock.lock()
+            let tap = stage == .session ? sessionTap : annotatedTap
+            tapLock.unlock()
+            if let tap = tap {
+                CGEvent.tapEnable(tap: tap, enable: true)
+                gate.resetTap(isEnabled: isRunning)
+            }
+            return Unmanaged.passUnretained(event)
+        }
+
+        let enabled = tapsEnabled
+        let decision = stages.handle(stage: stage, type: type, event: event, gate: gate,
+                                     sessionEnabled: enabled.session, annotatedEnabled: enabled.annotated,
+                                     modifier: settings.hotkeyModifier, doubleTapMode: settings.doubleTapMode,
+                                     now: ProcessInfo.processInfo.systemUptime)
+        if !enabled.session || !enabled.annotated { releasePendingKeys() }
+        switch decision {
+        case .drop:
+            return nil
+        case let .route(payload, pid):
+            // Process targeting does not prove field identity or application ACK.
+            payload.postToPid(pid)
+            return nil
+        case let .hotkey(pid, generation, triggeredAt):
+            onHotkeyTriggered?(pid, generation, triggeredAt)
+            return Unmanaged.passUnretained(event)
+        case .passThrough:
+            return Unmanaged.passUnretained(event)
+        }
+    }
+
+    private func releasePendingKeys() {
+        for (up, pid) in gate.takePendingKeyUps() {
+            up.postToPid(pid)
+        }
+    }
+
+    private func resetHotkey() {
+        stages.disarm()
+    }
+
+    static func checkedPID(_ value: Int64) -> pid_t? {
+        guard value > 0 else { return nil }
+        return pid_t(exactly: value)
+    }
+}
+
+/// Pure stage dispatch: retain only one modifier fingerprint, never an event or typed text.
+struct KeyboardEventStages {
+    enum Stage {
+        case session
+        case annotated
+    }
+
+    enum Decision {
+        case passThrough
+        case drop
+        case route(CGEvent, pid_t)
+        case hotkey(pid_t?, UInt64, TimeInterval)
+    }
+
+    private var modifierEvent: (timestamp: CGEventTimestamp, keyCode: Int64,
+                               sourceUserData: Int64, generation: UInt64)?
+    private var hotkey = ModifierHotkeyDetector()
+
+    mutating func disarm() {
+        modifierEvent = nil
+        hotkey.disarm()
+    }
+
+    mutating func handle(stage: Stage, type: CGEventType, event: CGEvent, gate: SyntheticInputGate,
+                         sessionEnabled: Bool, annotatedEnabled: Bool,
+                         modifier: SettingsManager.HotkeyModifier, doubleTapMode: Bool,
+                         now: TimeInterval) -> Decision {
+        let ready = sessionEnabled && annotatedEnabled
+        if !ready {
+            // Readiness comes from both live handles, not just their disable notifications.
+            gate.resetTap(isEnabled: false)
+            disarm()
+        }
+
+        let token = event.getIntegerValueField(.eventSourceUserData)
+        switch stage {
+        case .session:
+            if SyntheticInputGate.ownsToken(token) {
+                switch gate.handle(type: type, token: token) {
+                case .passThrough: return .passThrough
+                case .drop: return .drop
+                case let .route(payload, pid): return .route(payload, pid)
+                }
+            }
+            if SyntheticInputGate.isUserActivity(type) {
+                let generation = gate.recordActivity()
+                if type == .flagsChanged, ready {
+                    if modifierEvent != nil { hotkey.disarm() }
+                    modifierEvent = (event.timestamp, event.getIntegerValueField(.keyboardEventKeycode),
+                                     token, generation)
+                } else {
+                    disarm()
+                }
+            }
+        case .annotated:
+            // postToPid echoes must pass untouched and must not count as fresh user input.
+            guard type == .flagsChanged, !SyntheticInputGate.ownsToken(token) else { return .passThrough }
+            guard ready, let observed = modifierEvent,
+                  observed.timestamp == event.timestamp,
+                  observed.keyCode == event.getIntegerValueField(.keyboardEventKeycode),
+                  observed.sourceUserData == token,
+                  observed.generation < UInt64.max,
+                  observed.generation == gate.activityGeneration else {
+                disarm()
+                return .passThrough
+            }
+            modifierEvent = nil
+            if hotkey.handle(keyCode: UInt16(truncatingIfNeeded: observed.keyCode), flags: event.flags,
+                             modifier: modifier, doubleTapMode: doubleTapMode, now: now) {
+                return .hotkey(KeyboardMonitor.checkedPID(event.getIntegerValueField(.eventTargetUnixProcessID)),
+                               observed.generation, now)
+            }
+        }
+        return .passThrough
+    }
+}
+
+/// Pure hotkey state: a tap is one aggregate down/up cycle, not one per side.
+struct ModifierHotkeyDetector {
+    private var previousFlags: CGEventFlags = []
+    private var targetModifier: SettingsManager.HotkeyModifier?
+    private var modifierWasAlone = false
+    private var lastReleaseTime: TimeInterval?
+    private let doubleTapThreshold: TimeInterval = 0.4
+
+    mutating func disarm() {
+        // Preserve aggregate state so a partial release cannot rearm the gesture.
+        modifierWasAlone = false
+        lastReleaseTime = nil
+    }
+
+    mutating func handle(keyCode: UInt16, flags: CGEventFlags, modifier: SettingsManager.HotkeyModifier,
+                         doubleTapMode: Bool, now: TimeInterval) -> Bool {
+        let targetFlag = modifier.cgEventFlag
+        let modifierFlags: CGEventFlags = [.maskAlternate, .maskShift, .maskControl, .maskCommand]
+        let currentFlags = flags.intersection(modifierFlags)
+        let wasDown = previousFlags.contains(targetFlag)
+        let isDown = currentFlags.contains(targetFlag)
+        previousFlags = currentFlags
+
+        if targetModifier != modifier {
+            targetModifier = modifier
+            disarm()
+        }
+
+        guard isModifierKeyCode(keyCode, modifier: modifier) else {
+            disarm()
+            return false
+        }
+        if isDown {
+            if currentFlags != targetFlag {
+                disarm()
+            } else if !wasDown {
+                modifierWasAlone = true
+            }
+            return false
+        }
+        guard wasDown, modifierWasAlone, currentFlags.isEmpty else {
+            disarm()
+            return false
+        }
+        modifierWasAlone = false
+        if !doubleTapMode {
+            lastReleaseTime = nil
+            return true
+        }
+        if let lastReleaseTime = lastReleaseTime,
+           now >= lastReleaseTime, now - lastReleaseTime < doubleTapThreshold {
+            self.lastReleaseTime = nil
+            return true
+        }
+        lastReleaseTime = now
+        return false
+    }
+
     private func isModifierKeyCode(_ keyCode: UInt16, modifier: SettingsManager.HotkeyModifier) -> Bool {
         switch modifier {
-        case .option:  return keyCode == 58 || keyCode == 61  // kVK_Option / kVK_RightOption
-        case .shift:   return keyCode == 56 || keyCode == 60  // kVK_Shift / kVK_RightShift
-        case .control: return keyCode == 59 || keyCode == 62  // kVK_Control / kVK_RightControl
-        case .command: return keyCode == 55 || keyCode == 54  // kVK_Command / kVK_RightCommand
+        case .option: return keyCode == 58 || keyCode == 61
+        case .shift: return keyCode == 56 || keyCode == 60
+        case .control: return keyCode == 59 || keyCode == 62
+        case .command: return keyCode == 55 || keyCode == 54
         }
-    }
-    
-    private func triggerHotkey() {
-        let text = bufferContent
-        
-        guard !text.isEmpty else {
-            onHotkeyTriggered?("")
-            return
-        }
-        
-        onHotkeyTriggered?(text)
-    }
-    
-    // MARK: - Text Manipulation via CGEvent
-    
-    /// Delete `count` characters by simulating Backspace
-    func deleteCharacters(count: Int) {
-        isSendingEvents = true
-        for _ in 0..<count {
-            simulateKeyPress(keyCode: 51, flags: [])
-            usleep(8000)  // 8ms delay for reliability
-        }
-        isSendingEvents = false
-    }
-    
-    /// Type a string via clipboard (reliable for Unicode)
-    func typeString(_ text: String) {
-        let log = Logger.shared
-        isSendingEvents = true
-        
-        let pasteboard = NSPasteboard.general
-        
-        // Save ALL current clipboard items
-        let savedItems = pasteboard.pasteboardItems?.map { item -> (String, [NSPasteboard.PasteboardType: Data]) in
-            var typeData: [NSPasteboard.PasteboardType: Data] = [:]
-            for type in item.types {
-                if let data = item.data(forType: type) {
-                    typeData[type] = data
-                }
-            }
-            return ("", typeData)
-        } ?? []
-        
-        // Set new clipboard content
-        pasteboard.clearContents()
-        let success = pasteboard.setString(text, forType: .string)
-        let changeCount = pasteboard.changeCount
-        log.log("📋 Clipboard set: success=\(success), text=\"\(text)\", changeCount=\(changeCount)")
-        
-        // Wait for pasteboard to be ready
-        usleep(50000)  // 50ms
-        
-        // Verify clipboard was set
-        let verify = pasteboard.string(forType: .string)
-        log.log("📋 Clipboard verify: \"\(verify ?? "nil")\"")
-        
-        // Simulate ⌘V
-        simulateKeyPress(keyCode: 9, flags: .maskCommand)  // kVK_ANSI_V
-        
-        isSendingEvents = false
-        
-        // Restore previous clipboard after a longer delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            pasteboard.clearContents()
-            for (_, typeData) in savedItems {
-                let newItem = NSPasteboardItem()
-                for (type, data) in typeData {
-                    newItem.setData(data, forType: type)
-                }
-                pasteboard.writeObjects([newItem])
-            }
-            log.log("📋 Clipboard restored")
-        }
-    }
-    
-    func simulateKeyPress(keyCode: UInt16, flags: CGEventFlags) {
-        let source = CGEventSource(stateID: .hidSystemState)
-        
-        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: true)
-        keyDown?.flags = flags
-        keyDown?.post(tap: .cghidEventTap)
-        
-        usleep(5000)  // 5ms between down and up
-        
-        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: false)
-        keyUp?.flags = flags
-        keyUp?.post(tap: .cghidEventTap)
     }
 }

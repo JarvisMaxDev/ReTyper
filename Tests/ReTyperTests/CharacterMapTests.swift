@@ -35,14 +35,10 @@ final class CharacterMapTests: XCTestCase {
     }
     
     func testBelarusianMappingCompleteness() {
-        // Note: Belarusian maps both ] and } to ' (apostrophe),
-        // so the reverse map has a collision — only one direction survives.
-        // We skip colliding entries in this test.
-        let collidingValues: Set<Character> = ["'"]
         for (en, by) in CharacterMap.englishToBelarusian {
-            if collidingValues.contains(by) { continue }
-            XCTAssertEqual(CharacterMap.belarusianToEnglish[by], en,
-                           "Missing reverse mapping for Belarusian: \(by) should map back to \(en)")
+            let expected: Character = by == "'" ? "]" : en
+            XCTAssertEqual(CharacterMap.belarusianToEnglish[by], expected,
+                           "Belarusian reverse mapping must prefer the unshifted bracket for the apostrophe")
         }
     }
     
@@ -87,14 +83,27 @@ final class CharacterMapTests: XCTestCase {
         XCTAssertTrue(CharacterMap.isLatinLayout("com.apple.keylayout.ABC"))
         XCTAssertTrue(CharacterMap.isLatinLayout("com.apple.keylayout.PolishPro"))
         XCTAssertTrue(CharacterMap.isLatinLayout("com.apple.keylayout.British"))
+        XCTAssertTrue(CharacterMap.isLatinLayout("com.apple.keylayout.French"))
+        XCTAssertTrue(CharacterMap.isLatinLayout("com.apple.keylayout.Dvorak"))
+    }
+
+    func testUnknownLayoutIsNotClassifiedAsLatinByPrefixOrSubstring() {
+        for id in ["com.apple.keylayout.Arabic", "com.apple.keylayout.Unknown", "com.apple.keylayout.US-extra",
+                   "org.example.PolishPro", "US", ""] {
+            XCTAssertFalse(CharacterMap.isLatinLayout(id), id)
+        }
     }
     
     func testIsCyrillicLayout() {
-        XCTAssertNotNil(CharacterMap.cyrillicLayout(for: "com.apple.keylayout.Russian"))
-        XCTAssertNotNil(CharacterMap.cyrillicLayout(for: "com.apple.keylayout.RussianWin"))
-        XCTAssertNotNil(CharacterMap.cyrillicLayout(for: "com.apple.keylayout.Ukrainian"))
-        XCTAssertNotNil(CharacterMap.cyrillicLayout(for: "com.apple.keylayout.Ukrainian-PC"))
-        XCTAssertNotNil(CharacterMap.cyrillicLayout(for: "com.apple.keylayout.Belarusian"))
+        for layout in CharacterMap.CyrillicLayout.allCases {
+            XCTAssertEqual(CharacterMap.cyrillicLayout(for: layout.rawValue), layout)
+        }
+    }
+
+    func testCyrillicLayoutRejectsPartialAndUnknownIdentifiers() {
+        for id in ["", "Russian", "com.apple.keylayout.", "com.apple.keylayout.RussianWin-extra"] {
+            XCTAssertNil(CharacterMap.cyrillicLayout(for: id), id)
+        }
     }
     
     func testCyrillicIsNotLatin() {

@@ -39,8 +39,7 @@ struct TextConverter {
     /// - If text is Cyrillic → convert to Latin, return target Latin layout ID
     static func autoConvert(_ text: String, availableLayoutIDs: [String]) -> (converted: String, targetLayoutID: String?) {
         let script = detectScript(text)
-        let log = Logger.shared
-        log.log("   📝 Detected script: \(script), text: \"\(text)\"")
+        Logger.shared.log("   📝 Detected script: \(script) (len=\(text.count))")
         
         switch script {
         case .latin:
@@ -63,7 +62,7 @@ struct TextConverter {
                         cyrLayout.toEnglishMap[char] ?? char
                     })
                     // Find the Latin target layout
-                    if let latinID = availableLayoutIDs.first(where: { CharacterMap.isLatinLayout($0) }) {
+                    if let latinID = availableLayoutIDs.first(where: { CharacterMap.isSupportedLatinTarget($0) }) {
                         return (converted, latinID)
                     }
                 }

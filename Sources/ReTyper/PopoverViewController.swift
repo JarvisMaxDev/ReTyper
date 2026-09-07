@@ -7,8 +7,27 @@ final class PopoverViewController: NSViewController {
     
     private let settings = SettingsManager.shared
     private let layoutManager = LayoutManager.shared
+    private var isRecoveryAvailable = false
+    private var outcomeMessage: String?
     
     var onQuit: (() -> Void)?
+    var onCopyOriginal: (() -> Void)?
+    var onClearRecovery: (() -> Void)?
+    var onContentSizeChanged: ((NSSize) -> Void)?
+
+    func showRecovery(_ isAvailable: Bool) {
+        guard isRecoveryAvailable != isAvailable else { return }
+        isRecoveryAvailable = isAvailable
+        if isViewLoaded {
+            rebuildUI()
+        }
+    }
+
+    func showOutcomeMessage(_ message: String?) {
+        guard outcomeMessage != message else { return }
+        outcomeMessage = message
+        if isViewLoaded { rebuildUI() }
+    }
     
     // MARK: - Lifecycle
     
@@ -46,6 +65,8 @@ final class PopoverViewController: NSViewController {
             buildGeneralSection(),
             buildSwitchingSection(),
             buildPermissionsSection(),
+            buildOutcomeSection(),
+            buildRecoverySection(),
             buildFooterSection(),
         ] {
             for view in section {
@@ -56,8 +77,15 @@ final class PopoverViewController: NSViewController {
         // Calculate height
         stack.layoutSubtreeIfNeeded()
         let height = stack.fittingSize.height
-        self.preferredContentSize = NSSize(width: 340, height: height)
-        view.frame = NSRect(x: 0, y: 0, width: 340, height: height)
+        let size = NSSize(width: 340, height: ceil(height))
+        preferredContentSize = size
+        if let onContentSizeChanged {
+            // A hosted view is resized by its container, not by two competing owners.
+            if view.superview == nil { view.setFrameSize(size) }
+            onContentSizeChanged(size)
+        } else {
+            view.setFrameSize(size)
+        }
     }
     
     // MARK: - Section Builders
@@ -104,8 +132,55 @@ final class PopoverViewController: NSViewController {
             makeVersionLabel(),
         ]
     }
+
+    private func buildRecoverySection() -> [NSView] {
+        guard isRecoveryAvailable else { return [] }
+        return [
+            makeRecoveryActionRow(title: "Copy Original Text", action: #selector(copyOriginalClicked)),
+            makeRecoveryActionRow(title: "Clear Recovery", action: #selector(clearRecoveryClicked)),
+            makeSeparator(),
+        ]
+    }
+
+    private func buildOutcomeSection() -> [NSView] {
+        guard let outcomeMessage else { return [] }
+        let row = makeRowContainer()
+        let label = NSTextField(wrappingLabelWithString: outcomeMessage)
+        label.font = .systemFont(ofSize: 12)
+        label.textColor = .secondaryLabelColor
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.preferredMaxLayoutWidth = 308
+        row.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: row.leadingAnchor, constant: 16),
+            label.trailingAnchor.constraint(equalTo: row.trailingAnchor, constant: -16),
+            label.topAnchor.constraint(equalTo: row.topAnchor, constant: 8),
+            label.bottomAnchor.constraint(equalTo: row.bottomAnchor, constant: -8),
+        ])
+        return [row, makeSeparator()]
+    }
     
     // MARK: - Row Builders
+
+    private func makeRecoveryActionRow(title: String, action: Selector) -> NSView {
+        let row = makeRowContainer()
+        let button = NSButton(title: title, target: self, action: action)
+        button.isBordered = false
+        button.alignment = .left
+        button.font = .systemFont(ofSize: 13)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        row.addSubview(button)
+
+        NSLayoutConstraint.activate([
+            button.leadingAnchor.constraint(equalTo: row.leadingAnchor, constant: 16),
+            button.trailingAnchor.constraint(equalTo: row.trailingAnchor, constant: -16),
+            button.topAnchor.constraint(equalTo: row.topAnchor),
+            button.bottomAnchor.constraint(equalTo: row.bottomAnchor),
+            row.heightAnchor.constraint(equalToConstant: 36),
+        ])
+
+        return row
+    }
     
     private func makePermissionStatusRow() -> NSView {
         let accessOpts = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): false] as CFDictionary
@@ -555,6 +630,25 @@ final class PopoverViewController: NSViewController {
     }
     
     // MARK: - Actions
+
+    @objc private func copyOriginalClicked() {
+        guard isRecoveryAvailable else { return }
+        onCopyOriginal?()
+    }
+
+    @objc private func clearRecoveryClicked() {
+        guard isRecoveryAvailable else { return }
+
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = "Clear Recovery?"
+        alert.informativeText = "Only clear recovery after inspecting the target and manually restoring the original text if needed. An input event with an unknown delivery result cannot be recalled, and clearing recovery will not undo it.\n\nThis discards the original text kept in memory and allows new text replacement operations."
+        alert.addButton(withTitle: "Cancel").keyEquivalent = "\r"
+        alert.addButton(withTitle: "Clear Recovery")
+
+        guard alert.runModal() == .alertSecondButtonReturn, isRecoveryAvailable else { return }
+        onClearRecovery?()
+    }
     
     @objc private func toggleAutostart(_ sender: NSSwitch) {
         settings.autostartAfterLogin = sender.state == .on

@@ -26,6 +26,8 @@ _CodeSignature/
 *.zip
 ReTyper-universal
 dmg_contents/
+/.version
+/.retyper-package.*/
 
 # IDE
 .swiftpm/
@@ -34,3 +36,11 @@ dmg_contents/
 
 # Spec Kit downloaded catalog cache (regenerated on demand)
 .specify/extensions/.cache/
+
+# Local package state and temporary files
+Packages/
+*.swiftpm/
+*.log
+*.tmp
+Thumbs.db
+.env*
