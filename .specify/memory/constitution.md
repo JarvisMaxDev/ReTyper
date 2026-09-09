@@ -1,18 +1,20 @@
 <!--
 Sync Impact Report
 - Base: ratified constitution 1.0.0 from main, commit 7f5465d; the working branch held a scaffold
-- Version change: 2.0.0 -> 3.0.0 (MAJOR: explicitly approved one-release acceptance exception)
-- Modified principle III: distinguish cancelled input from unknown delivered input; retain original; prohibit blind retries
-- Expanded principle V: mandatory CI unit tests before build/signing; release depends on successful build job
-- Governance: main-first solo workflow, no mandatory feature branches or PRs
-- Approval: maintainer's explicit safe-abort/manual-recovery decisions and request to resolve analysis findings C1-C3
-- Migration: synchronize current feature artifacts; no app-version, bundle-id, preference or platform migration
+- Version change: 3.0.0 -> 4.0.0 (MAJOR: newly approved reduced acceptance scope for one AX-compatibility patch)
+- Approval 2026-09-09: maintainer requested commit/push to main, was warned about automatic release, and explicitly accepted the stated bounded gate
+- Scope: first patch after public v0.9.1, only the approved missing AXEnabled / immutable AX window-source compatibility fix and strict field-focus validation
+- Modified acceptance obligations: principles III/V and process 5/6/8; no privacy, security or protective-behavior exception
+- Before commit AND push: fresh full unit tests, universal release build, packaging/signature checks, completed native validation and fresh visual screenshot; none may be waived
+- After push: full CI for the published revision and checks of actual published assets; local results do not replace either
+- Deferred only as explicitly approved: full repeated matrices, old-version performance comparisons, separate Intel/macOS 12 runtime
+- Expiry: one publication; post-publication verification remains mandatory and does not authorize another release
+- Unchanged: main-first workflow, minimum OS, dependencies, bundle identity, preferences, application versioning and protective behavior
+- History: amendments 2.0.0/3.0.0 retained; the v0.9.1 exception expired and is not extended
+- Migration: no application/data migration or manual release-version change; synchronize current normative references separately
 - Deferred placeholders: none
-- Original release gates: retained as incomplete evidence in tasks.md and verification.md; the one-release exception below applies only to the explicitly approved validation scope
-- Amendment 2026-09-07: maintainer explicitly approved the bounded gate for the first patch release after v0.9.0
-- Modified validation scope: expanded manual matrices, performance baseline, additional failure injection, separate Intel/macOS 12 runtime, and remaining real clipboard/log sessions are deferred for this release only
-- Unchanged: privacy and protective behavior of principles I/III, minimum OS, runtime dependencies, application versioning, required tests/build/signing/launch/CI/artifact checks
-- Sync: specs/001-fix-retype-text-replacement/release-gate.md records approval, scope, evidence and deferred work without marking unrun tests passed
+- Sync: release-gate.md records the new approval and pending checks; current references in spec.md, plan.md, quickstart.md and tasks.md need a separate update by the primary implementer
+- Evidence: no new tests, native/visual checks, CI, commit/push or publication marked complete by this amendment; historical ledgers remain unchanged
 -->
 # ReTyper Constitution
 
@@ -211,6 +213,59 @@ MUST зависеть от успешного `build`; ошибка или пр�
 и не утверждение универсальной совместимости. Версия конституции изменена на 3.0.0 из-за изменения
 приёмочного гейта; это не breaking change приложения, не миграция настроек и не ручное повышение его версии.
 
+## Одноразовый гейт AX-совместимости, 2026-09-09
+
+Владелец явно запросил «Сделай коммит с описанием исправления и запуши в основную ветку».
+После предупреждения, что push в `main` запускает автоматический patch-релиз, он ответил
+«Да, такой объём» на конкретный гейт, записанный в [release-gate.md](../../specs/001-fix-retype-text-replacement/release-gate.md#гейт-ax-совместимости-2026-09-09).
+Цель: доставить согласованное исправление совместимости без ожидания полной многократной
+матрицы и недоступных отдельных целевых сред. Это **новое явное разрешение**, не продление
+исчерпанного исключения 2026-09-07 для опубликованной 0.9.1.
+
+Область: **только первый patch-релиз после публичной `v0.9.1` с данным AX-исправлением**.
+Отсутствующий `AXEnabled` допускается только для `AXTextArea` с writable value/range;
+прямой `AXWindow` сохраняет приоритет, резервный `AXFocusedWindow` разрешён только при
+отсутствии прямого атрибута, положительном `applicationPID == activationPID == текущий активный PID`
+и строгом `CFBoolean true` фокуса поля. Дополнительные проверки роли окна `AXWindow` и владельцев обоих поля/окна
+относятся только к резервному пути. Источник окна неизменяемый, повторно проверяются только
+выбранный источник и прежние поле/окно; реальные ошибки, неверные значения и потеря источника
+не разрешают его подмену. Строгий `CFBoolean` применяется и к прежнему фокусу неактивирующего
+получателя. Это ограниченный объём выпуска, не разрешение иных изменений поведения или защиты.
+
+Для этого кандидата действует следующий порядок вместо полной исходной приёмки принципов
+III/V и процесса п. 5/6/8:
+
+- **До коммита и до пуша в `main`** MUST успешно завершиться свежие полные unit-тесты,
+  универсальная release-сборка arm64/x86_64, проверки упаковки и подписи кандидата/извлечённых
+  архивов, запуск свежей сборки и нативная проверка исправленного AX-пути с сохранением прямого
+  пути. Визуальная проверка MUST быть завершена и подтверждена **свежим скриншотом до коммита
+  и пуша**. Отсутствие или незавершённость любой из этих проверок MUST блокировать оба действия;
+  это исключение не позволяет пропустить нативную или визуальную проверку.
+- После пуша MUST пройти полный CI публикуемой ревизии, включая обязательные тесты/build и
+  release pipeline. После публикации MUST быть проверены фактические публичные DMG/ZIP,
+  их версия, архитектуры, подписи и содержимое. Локальная сборка, существование тега или
+  ограниченные пользовательские подтверждения не заменяют эти проверки.
+- За этот выпуск MAY быть перенесены **полные многократные матрицы, замеры относительно старой
+  версии и отдельные Intel/macOS 12 runtime-прогоны**. Их состояния MUST оставаться «не проверено»
+  или «частично», без PASS и без закрытия прежних task ID. Старый список переносов 2026-09-07
+  не является дополнительным разрешением нового гейта.
+
+Владелец исключения: maintainer. Оно истекает после **одной публикации** указанного patch-релиза;
+обязанность проверить CI/публичные артефакты сохраняется после публикации. Неполная проверка
+или сбой после публикации не разрешают ещё один выпуск. Следующее изменение объёма или выпуск
+требуют нового явного решения. Номер приложения определяет существующий semantic-release,
+конкретная следующая версия заранее не закрепляется и version-файлы этой поправкой не меняются.
+
+Приватность и защитные обязанности принципов I/III MUST сохраняться без исключений. Новый
+дефект сохранности/приватности либо провал обязательного гейта MUST останавливать выпуск;
+неизвестный исход не становится успехом. Проверки, коммит/пуш, CI и публикация этой записью
+**не объявляются выполненными**; основной исполнитель фиксирует фактические результаты отдельно.
+
+Это MAJOR-поправка **3.0.0 -> 4.0.0**, поскольку заново сокращён обязательный объём приёмки
+одного выпуска. Поведение безопасности, версия приложения, bundle ID, настройки, минимум
+системы и архитектуры этим исключением не меняются; миграция данных не требуется. Текущие
+нормативные ссылки синхронизируются отдельно, исторические свидетельства 0.9.1 сохраняются.
+
 ## Governance
 
 Эта конституция имеет приоритет над README, локальными привычками и отдельными планами. Все
@@ -236,4 +291,4 @@ MUST зависеть от успешного `build`; ошибка или пр�
 обязательного шага, локальные результаты и доказательство удалённого прогона учитываются
 раздельно в задачах и отчёте; добавление шага само по себе не является успешным CI-прогоном.
 
-**Version**: 3.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-09-07
+**Version**: 4.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-09-09

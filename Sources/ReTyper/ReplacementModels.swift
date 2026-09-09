@@ -7,6 +7,11 @@ enum FragmentOrigin {
     case caretBoundary
 }
 
+enum TextWindowSource {
+    case field
+    case application
+}
+
 /// Capabilities are eligibility checks, not proof that a keyboard command was applied.
 struct TextAccessCapability {
     /// Recipient of the annotated hotkey event; it may own a nonactivating panel.
@@ -15,6 +20,7 @@ struct TextAccessCapability {
     let activationPID: pid_t
     let element: AXUIElement
     let window: AXUIElement
+    let windowSource: TextWindowSource
     let elementRole: String
     let canSetValue: Bool
     let canSetSelection: Bool

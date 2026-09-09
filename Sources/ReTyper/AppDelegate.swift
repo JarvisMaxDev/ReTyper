@@ -101,6 +101,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard !replacementRunning else { return }
         let activationPID = NSWorkspace.shared.frontmostApplication?.processIdentifier
         guard let applicationPID, let activationPID else {
+            Logger.shared.log("Replacement entry rejected: recipientAvailable=\(applicationPID != nil), activationAvailable=\(activationPID != nil)")
             let reason: AbortReason = coordinator.recoveryOriginalText == nil ? .noTextAccess : .recoveryPending
             let result = ReplacementResult(outcome: .aborted(reason))
             applyLayoutSwitch(result, activationPID: activationPID, generation: generation)

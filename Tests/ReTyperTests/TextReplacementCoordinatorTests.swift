@@ -10,7 +10,7 @@ final class TextReplacementCoordinatorTests: XCTestCase {
 
     private final class Access: TextAccessProviding {
         var target = TextAccessCapability(applicationPID: 123, activationPID: 123, element: AXUIElementCreateApplication(123),
-                                          window: AXUIElementCreateApplication(124), elementRole: "AXTextArea",
+                                          window: AXUIElementCreateApplication(124), windowSource: .field, elementRole: "AXTextArea",
                                           canSetValue: true, canSetSelection: true)
         var state = TextSnapshot(value: "ghbdtn tail", caretLocation: 6, selectionLength: 0, selectedText: "")
         var focused = true
@@ -153,7 +153,7 @@ final class TextReplacementCoordinatorTests: XCTestCase {
     func testReadOnlyTerminalIsNotAuthorizedToDelete() {
         let access = Access(), input = Input(), clock = Clock()
         access.target = TextAccessCapability(applicationPID: 123, activationPID: 123, element: access.target.element, window: access.target.window,
-                                              elementRole: "AXTextArea", canSetValue: false, canSetSelection: true)
+                                              windowSource: .field, elementRole: "AXTextArea", canSetValue: false, canSetSelection: true)
         XCTAssertEqual(coordinator(access, input, clock).performReplacement(options).outcome, .aborted(.unsupportedField))
         XCTAssertTrue(input.sent.isEmpty)
         XCTAssertTrue(access.selections.isEmpty)
@@ -359,7 +359,7 @@ final class TextReplacementCoordinatorTests: XCTestCase {
         let access = Access(), input = Input(), clock = Clock()
         access.target = TextAccessCapability(applicationPID: 456, activationPID: 123,
                                              element: AXUIElementCreateApplication(456), window: AXUIElementCreateApplication(456),
-                                             elementRole: "AXTextField", canSetValue: true, canSetSelection: true)
+                                             windowSource: .field, elementRole: "AXTextField", canSetValue: true, canSetSelection: true)
         let overlay = ReplacementOptions(applicationPID: 456, activationPID: 123, inputGeneration: 10,
                                          triggeredAt: 1, onlyLastWord: true, availableLayoutIDs: [])
         input.onSend = { self.apply($0, to: access) }
@@ -374,7 +374,7 @@ final class TextReplacementCoordinatorTests: XCTestCase {
         let access = Access(), input = Input(), clock = Clock()
         access.target = TextAccessCapability(applicationPID: 123, activationPID: 456,
                                              element: access.target.element, window: access.target.window,
-                                             elementRole: "AXTextField", canSetValue: true, canSetSelection: true)
+                                             windowSource: .field, elementRole: "AXTextField", canSetValue: true, canSetSelection: true)
         XCTAssertEqual(coordinator(access, input, clock).performReplacement(options).outcome, .aborted(.contextChanged))
         XCTAssertTrue(input.sent.isEmpty)
     }

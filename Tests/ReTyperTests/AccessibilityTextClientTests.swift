@@ -18,4 +18,29 @@ final class AccessibilityTextClientTests: XCTestCase {
             XCTAssertFalse(AccessibilityTextClient.acceptsSubrole(value))
         }
     }
+
+    func testTextAreaMayOmitEnabledAttribute() {
+        XCTAssertTrue(AccessibilityTextClient.acceptsEnabled(nil, role: "AXTextArea"))
+    }
+
+    func testOtherRolesStillRequireEnabledAttribute() {
+        for role in ["AXTextField", "AXComboBox", "AXButton", ""] {
+            XCTAssertFalse(AccessibilityTextClient.acceptsEnabled(nil, role: role), role)
+        }
+    }
+
+    func testExplicitEnabledAndDisabledStatesAreRespected() {
+        for role in ["AXTextArea", "AXTextField", "AXComboBox"] {
+            XCTAssertTrue(AccessibilityTextClient.acceptsEnabled(kCFBooleanTrue, role: role), role)
+            XCTAssertFalse(AccessibilityTextClient.acceptsEnabled(kCFBooleanFalse, role: role), role)
+        }
+    }
+
+    func testPresentEnabledValueMustBeBoolean() {
+        let values: [CFTypeRef] = [NSNumber(value: 0), NSNumber(value: 1), NSNumber(value: 42),
+                                   "true" as CFString, NSArray(), NSDictionary()]
+        for value in values {
+            XCTAssertFalse(AccessibilityTextClient.acceptsEnabled(value, role: "AXTextArea"))
+        }
+    }
 }
