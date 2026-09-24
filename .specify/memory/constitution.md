@@ -1,20 +1,14 @@
 <!--
 Sync Impact Report
-- Base: ratified constitution 1.0.0 from main, commit 7f5465d; the working branch held a scaffold
-- Version change: 3.0.0 -> 4.0.0 (MAJOR: newly approved reduced acceptance scope for one AX-compatibility patch)
-- Approval 2026-09-09: maintainer requested commit/push to main, was warned about automatic release, and explicitly accepted the stated bounded gate
-- Scope: first patch after public v0.9.1, only the approved missing AXEnabled / immutable AX window-source compatibility fix and strict field-focus validation
-- Modified acceptance obligations: principles III/V and process 5/6/8; no privacy, security or protective-behavior exception
-- Before commit AND push: fresh full unit tests, universal release build, packaging/signature checks, completed native validation and fresh visual screenshot; none may be waived
-- After push: full CI for the published revision and checks of actual published assets; local results do not replace either
-- Deferred only as explicitly approved: full repeated matrices, old-version performance comparisons, separate Intel/macOS 12 runtime
-- Expiry: one publication; post-publication verification remains mandatory and does not authorize another release
-- Unchanged: main-first workflow, minimum OS, dependencies, bundle identity, preferences, application versioning and protective behavior
-- History: amendments 2.0.0/3.0.0 retained; the v0.9.1 exception expired and is not extended
-- Migration: no application/data migration or manual release-version change; synchronize current normative references separately
-- Deferred placeholders: none
-- Sync: release-gate.md records the new approval and pending checks; current references in spec.md, plan.md, quickstart.md and tasks.md need a separate update by the primary implementer
-- Evidence: no new tests, native/visual checks, CI, commit/push or publication marked complete by this amendment; historical ledgers remain unchanged
+- Base: ratified constitution 1.0.0 from main, commit 7f5465d
+- Version change: 4.0.0 -> 5.0.0 (MAJOR: principle III redefined)
+- Reason 2026-09-24: the maintainer reported that 0.9.1-0.9.2 worked much worse than 0.9.0. Analysis confirmed that the Accessibility-only replacement refused often and silently ignored the hotkey around mouse movement or key releases. The maintainer chose "0.9.0 with fixes"
+- Modified principle III: the clipboard may carry the replacement with a full snapshot and a guarded restore; replacement is a paste over a selection; a known caret is never copied; an unchanged pasteboard is never pasted; terminals and secure fields only switch the layout; hotkey detection depends on key events only
+- Removed with the replaced path: mandatory full-value Accessibility confirmation, recovery blocking and manual recovery actions
+- Unchanged: principles I, II, IV, V, product constraints, development process, main-first workflow, minimum OS, bundle identity and preferences
+- History: amendments 2.0.0-4.0.0 retained below; both one-release exceptions have expired
+- Migration: none; preference keys are unchanged
+- Sync: README.md and spec.md describe the current path; plan.md, tasks.md, verification.md and release-gate.md remain history of the replaced path
 -->
 # ReTyper Constitution
 
@@ -42,46 +36,32 @@ ReTyper MUST обрабатывать клавиатурные события, �
 пользовательского текста.
 
 ### III. Сохранность текста и буфера обмена
-Замена MUST запускаться только явным настроенным хоткеем и направляться в выбранный этим
-действием контекст ввода. До отправки текста MUST быть определены валидный исходный фрагмент,
-результат преобразования и целевая раскладка; контекст, полное значение и диапазон MUST
-проверяться повторно. Неподтверждённое поле MUST пропускаться без отправки текста. Отдельное
-предварительное удаление и удаление по предполагаемому числу нажатий Backspace MUST NOT
-использоваться как запасной путь. Синтетические события MUST быть исключены из собственного
-мониторинга пользовательского ввода.
+Замена MUST запускаться только явным настроенным хоткеем. Распознавание хоткея MUST зависеть
+только от клавиатурных событий: движение мыши и отпускание других клавиш MUST NOT отменять жест.
+Синтетические события ReTyper MUST быть исключены из собственного мониторинга ввода.
 
-Автоматическая операция MUST NOT читать или изменять системный буфер обмена ни ради получения
-исходного текста, ни ради его вставки. Копирование сохранённого исходника в буфер допускается
-только по явному действию пользователя; это намеренная замена содержимого буфера, а не
-временная запись с последующим автоматическим восстановлением.
+Источником текста MAY быть только текущее выделение: выделение пользователя либо выделение,
+созданное ReTyper стандартными клавишами редактора. Если поле через Accessibility сообщает, что
+выделения нет, копирование MUST NOT выполняться: часть редакторов в этом случае копирует всю
+строку. Если копирование не изменило буфер обмена, его прежнее содержимое MUST NOT использоваться
+как текст; операция ограничивается сменой раскладки. Выделение, созданное ReTyper и не
+использованное для замены, MUST сниматься. Выделение пользователя, которое не удалось
+скопировать, MUST оставаться нетронутым.
 
-Приложение MUST различать отмену ещё не переданного ввода, наблюдаемый подтверждённый результат
-и неизвестный результат уже переданного ввода. Таймаут или прохождение локального перехватчика
-MUST NOT считаться подтверждением обработки целевым приложением либо доказательством отмены.
-После передачи события невозможно обещать транзакционную замену или отзыв события в произвольном
-чужом приложении. Вместо прежней безусловной гарантии неизменности поля при любом сбое действуют
-следующие обязательства:
+Замена MUST выполняться вставкой поверх выделения; отдельное предварительное удаление и удаление
+по предполагаемому числу нажатий Backspace MUST NOT использоваться. Если пользователь печатает
+или переключает приложение во время операции, вставка MUST NOT выполняться. В терминалах и
+защищённых полях (secure text) замена MUST NOT выполняться; допускается только смена раскладки.
 
-- Успех MUST подтверждаться полным ожидаемым значением и положением курсора/выделения в свежем
-  проверяемом контексте. Известный отказ до передачи MUST отменять ещё не переданный ввод.
-- При неизвестном, частичном или конфликтующем результате исходный фрагмент MUST сохраняться
-  в памяти, дальнейшие замены MUST блокироваться, пользователь MUST получить постоянное
-  предупреждение и явное действие копирования исходника для ручного восстановления.
-- Неизвестный исход MUST NOT компенсироваться слепым повторным вводом. Только наблюдаемое
-  полное преобразованное значение с неверным курсором допускает одну адресную попытку возврата
-  исходного фрагмента при свежем контексте и подтверждённом диапазоне. Возврат MUST проверяться;
-  при неудаче повтор запрещён и сохраняется путь ручного восстановления.
-- Очистка сохранённой копии и штатный выход с ней MUST требовать подтверждения после
-  предупреждения. Копирование само по себе MUST NOT снимать блокировку; явная очистка не
-  обещает отзыв события. Выход MUST ждать выполняющуюся операцию. Копия не является постоянным
-  хранилищем и исчезает при завершении процесса; принудительное завершение не обещает recovery.
+Буфер обмена MAY временно использоваться для копирования и вставки. Перед первым копированием
+MUST сохраняться всё его содержимое, а после операции оно MUST возвращаться, если за это время
+буфер не изменил кто-то другой. Временный текст ReTyper MUST помечаться маркерами nspasteboard.org,
+чтобы менеджеры буфера его не сохраняли. Содержимое буфера MUST NOT попадать в журнал и покидать
+процесс.
 
-Это не разрешение считать повреждённый текст успехом. Непредусмотренное дублирование, потеря
-либо обрезка в обычном заявленном сценарии MUST блокировать релиз до устранения причины.
-Контролируемая инъекция неизвестного исхода оценивается по указанным защитным обязательствам,
-не выдаётся за успешную замену и не подменяет проверку обычного сценария. Изменения этого потока
-требуют ручной проверки в нескольких приложениях: модульные тесты не моделируют полностью
-поведение Accessibility, CGEvent и принимающего редактора.
+Непредусмотренное дублирование, потеря либо обрезка текста в обычном сценарии MUST блокировать
+релиз до устранения причины. Изменения этого потока требуют ручной проверки в нескольких
+приложениях: модульные тесты не моделируют полностью поведение редакторов и буфера обмена.
 
 ### IV. Совместимость и нативная интеграция
 Поддерживаемый минимум MUST оставаться macOS 12.0 во всех метаданных сборки, упаковки и
@@ -266,6 +246,20 @@ III/V и процесса п. 5/6/8:
 системы и архитектуры этим исключением не меняются; миграция данных не требуется. Текущие
 нормативные ссылки синхронизируются отдельно, исторические свидетельства 0.9.1 сохраняются.
 
+## Поправка 2026-09-24: возврат к механизму 0.9.0
+
+После выпуска 0.9.2 владелец сообщил, что приложение работает заметно хуже, чем 0.9.0. Разбор
+подтвердил причины: замена только через Accessibility отказывала при особенностях отдельных
+приложений, а хоткей молча игнорировался при движении мыши или отпускании клавиши рядом с жестом.
+Исходный дефект 0.9.0 был узким: копирование без выделения в части редакторов отдаёт всю строку,
+в Терминале использовалось старое содержимое буфера, а текст стирался отдельным Backspace.
+
+Владелец выбрал вариант «0.9.0 с исправлениями»: вернуть выделение клавишами и копирование/вставку
+через буфер обмена, устранив только эти причины. Принцип III переписан под этот путь. Проверка
+полного значения через Accessibility, блокировка после неясного результата и ручное восстановление
+удалены вместе с прежним путём. Приватность журнала, обязательные проверки перед выпуском и остальные
+принципы не меняются. Это MAJOR-поправка 5.0.0; миграция настроек не требуется.
+
 ## Governance
 
 Эта конституция имеет приоритет над README, локальными привычками и отдельными планами. Все
@@ -291,4 +285,4 @@ III/V и процесса п. 5/6/8:
 обязательного шага, локальные результаты и доказательство удалённого прогона учитываются
 раздельно в задачах и отчёте; добавление шага само по себе не является успешным CI-прогоном.
 
-**Version**: 4.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-09-09
+**Version**: 5.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-09-24
