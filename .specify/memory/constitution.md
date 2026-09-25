@@ -1,14 +1,27 @@
 <!--
 Sync Impact Report
 - Base: ratified constitution 1.0.0 from main, commit 7f5465d
-- Version change: 4.0.0 -> 5.0.0 (MAJOR: principle III redefined)
-- Reason 2026-09-24: the maintainer reported that 0.9.1-0.9.2 worked much worse than 0.9.0. Analysis confirmed that the Accessibility-only replacement refused often and silently ignored the hotkey around mouse movement or key releases. The maintainer chose "0.9.0 with fixes"
-- Modified principle III: the clipboard may carry the replacement with a full snapshot and a guarded restore; replacement is a paste over a selection; a known caret is never copied; an unchanged pasteboard is never pasted; terminals and secure fields only switch the layout; hotkey detection depends on key events only
-- Removed with the replaced path: mandatory full-value Accessibility confirmation, recovery blocking and manual recovery actions
-- Unchanged: principles I, II, IV, V, product constraints, development process, main-first workflow, minimum OS, bundle identity and preferences
-- History: amendments 2.0.0-4.0.0 retained below; both one-release exceptions have expired
-- Migration: none; preference keys are unchanged
-- Sync: README.md and spec.md describe the current path; plan.md, tasks.md, verification.md and release-gate.md remain history of the replaced path
+- Version change: 5.0.0 -> 6.0.0 (MAJOR: principle II redefined)
+- Reason 2026-09-25: feature 002 converts symbols as well as letters. Hand-written tables were
+  incomplete (no Shift+digit symbols for Apple variants) and disagreed with macOS in places
+  (ISO `§` key, Apple Russian `/`). The maintainer chose system layouts with no fallback table
+  and explicitly requested this amendment
+- Modified principle II (title unchanged): mappings come from the macOS data of the layouts
+  selected in ReTyper for the current keyboard type; hand-written tables are forbidden, including
+  as a fallback; layouts without key data are excluded; collisions follow one fixed rule; tests
+  verify reference layouts on ANSI and ISO and fail rather than skip when a layout is missing
+- Modified process item 4: no longer names CharacterMap/TextConverter; refers to building mappings
+  and direction detection
+- Added section: "Поправка 2026-09-25: соответствия из системных раскладок"
+- Removed sections: none
+- Unchanged: principles I, III, IV, V, product constraints, remaining process items, governance,
+  minimum OS, bundle identity and preferences
+- History: amendments 2.0.0-5.0.0 retained below; both one-release exceptions have expired
+- Migration: none for preferences; conversion results change where old tables disagreed with
+  macOS, listed by the feature 002 plan before implementation
+- Templates: plan/spec/tasks templates read the constitution at runtime; no template changes needed
+- Pending sync (not done by this amendment): README.md "Supported Layouts" and the limitation about
+  US/ABC/Polish Pro targets describe the table-based behaviour and must be updated with feature 002
 -->
 # ReTyper Constitution
 
@@ -26,14 +39,28 @@ ReTyper MUST обрабатывать клавиатурные события, �
 самым работает с особо чувствительными данными.
 
 ### II. Детерминированная точность раскладок
-Каждая поддерживаемая раскладка MUST иметь явную таблицу соответствий с отдельным учётом Apple
-и PC-вариантов, регистра, пунктуации и символов с Shift. Одинаковые входной текст и упорядоченный
-набор активных раскладок MUST давать одинаковые результат и целевую раскладку. Символы без
-соответствия MUST сохраняться без изменений; если направление или совместимую целевую раскладку
-нельзя однозначно определить, исходный текст MUST остаться неизменным. Новая или изменённая
-таблица MUST сопровождаться тестами прямого преобразования, обратимости для взаимно-однозначных
-пар и явно документированных коллизий. Так ошибки раскладки не превращаются в тихое повреждение
-пользовательского текста.
+Соответствия клавиш MUST определяться по данным раскладок macOS, выбранных пользователем в
+ReTyper, для текущего типа клавиатуры (ANSI, ISO, JIS). Для каждой печатной клавиши без Shift и с
+Shift берётся символ, который она реально даёт в раскладке; так учитываются Apple- и PC-варианты,
+регистр, пунктуация и символы с Shift. Зашитые вручную таблицы соответствий MUST NOT
+использоваться, в том числе как запасной вариант. Раскладка, для которой система не отдаёт данные
+клавиш, MUST исключаться из преобразования. Данные раскладок MUST читаться локально.
+
+Одинаковые входной текст, упорядоченный набор выбранных раскладок, их системные данные и тип
+клавиатуры MUST давать одинаковые результат и целевую раскладку. Символы без соответствия MUST
+сохраняться без изменений; если направление или целевую раскладку нельзя однозначно определить,
+исходный текст MUST остаться неизменным. Коллизия, то есть символ, который в одной раскладке дают
+несколько клавиш, MUST разрешаться одним фиксированным документированным правилом.
+
+Изменение построения соответствий или определения направления MUST сопровождаться
+автоматическими тестами. Они сверяют результат с ожидаемыми символами эталонных раскладок: Apple и
+PC русской и украинской, белорусской, US, ABC, Polish Pro и хотя бы одной латинской раскладки с
+другим расположением букв, на типах клавиатуры ANSI и ISO. Тесты также проверяют обратимость
+взаимно-однозначных пар и правило коллизий. Ожидаемые значения в тестах — проверочные данные, а не
+источник соответствий приложения. Если эталонная раскладка недоступна в среде тестов, тест MUST
+завершаться ошибкой, а не пропускаться. Единственный источник правды совпадает с тем, что реально
+печатает клавиатура пользователя, а тесты не дают ошибкам раскладки превратиться в тихое
+повреждение текста.
 
 ### III. Сохранность текста и буфера обмена
 Замена MUST запускаться только явным настроенным хоткеем. Распознавание хоткея MUST зависеть
@@ -119,9 +146,10 @@ MUST зависеть от успешного `build`; ошибка или пр�
 3. Для исправления дефекта сначала MUST быть создан воспроизводящий тест либо точный ручной
    сценарий. Изменение MUST быть минимальным и не добавлять абстракции без текущего второго случая
    использования.
-4. Изменения `CharacterMap` или `TextConverter` MUST пройти весь набор
-   [XCTest](https://developer.apple.com/documentation/xctest) через `swift test`, включая новые
-   примеры регистра, пунктуации, направления и fallback-поведения.
+4. Изменения преобразования (построения соответствий из раскладок или определения направления)
+   MUST пройти весь набор [XCTest](https://developer.apple.com/documentation/xctest) через
+   `swift test`, включая сверку эталонных раскладок по принципу II и новые примеры регистра,
+   пунктуации, направления и поведения при неопределённости.
 5. Изменения UI или системной интеграции MUST пройти свежую локальную сборку, запуск app bundle и
    визуальную проверку. Поток хоткея MUST быть проверен с выделенным текстом, без выделения, с
    пустым вводом и с сохранением нескольких типов NSPasteboard.
@@ -260,6 +288,26 @@ III/V и процесса п. 5/6/8:
 удалены вместе с прежним путём. Приватность журнала, обязательные проверки перед выпуском и остальные
 принципы не меняются. Это MAJOR-поправка 5.0.0; миграция настроек не требуется.
 
+## Поправка 2026-09-25: соответствия из системных раскладок
+
+Владелец попросил преобразовывать не только буквы, но и символы на тех же клавишах
+([спецификация 002](../../specs/002-symbol-conversion/spec.md)). Проверка на его машине показала,
+что ручные таблицы неполны (в Apple-вариантах нет символов Shift+цифр) и местами расходятся с
+macOS: на клавиатуре ISO буква `ё` стоит на клавише `§`, а не `` ` ``; в Apple «Русская» `/`
+остаётся `/`. Владелец выбрал вариант «брать соответствия из системы, ручные таблицы удалить,
+без запасного источника» и явно поручил внести эту поправку.
+
+Принцип II переопределён: вместо явной таблицы на каждую раскладку источником соответствий служат
+данные выбранных раскладок macOS для текущего типа клавиатуры. Детерминированность, сохранение
+символов без соответствия, неизменность текста при неопределённости и обязательные тесты
+сохранены; тесты теперь сверяют эталонные раскладки. Процесс п. 4 перестал называть конкретные
+файлы. Остальные принципы, приватность и требования к проверке не меняются.
+
+Совместимость: результат меняется там, где прежняя таблица расходилась с реальной раскладкой;
+эти расхождения перечисляет план фичи 002 до реализации. Ключи и формат настроек, bundle ID,
+минимальная версия системы и архитектуры не меняются; миграция данных не требуется. Это
+MAJOR-поправка 6.0.0, поскольку принцип переопределён несовместимо.
+
 ## Governance
 
 Эта конституция имеет приоритет над README, локальными привычками и отдельными планами. Все
@@ -285,4 +333,4 @@ III/V и процесса п. 5/6/8:
 обязательного шага, локальные результаты и доказательство удалённого прогона учитываются
 раздельно в задачах и отчёте; добавление шага само по себе не является успешным CI-прогоном.
 
-**Version**: 5.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-09-24
+**Version**: 6.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-09-25
