@@ -1,4 +1,5 @@
 import Cocoa
+import Carbon
 
 /// Application delegate. Wires together all components and handles the app lifecycle.
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -89,12 +90,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         isReplacing = true
         let host = SystemReplacementHost(pid: app.processIdentifier, keyDownCount: keyboardMonitor.userKeyDownCount)
         let onlyLastWord = settings.switchOnlyLastWord
-        let availableLayouts = layoutManager.relevantLayoutIDs()
+        // Text Input Sources are read here, on the main thread; the queue only gets values.
+        let keyboardType = UInt32(LMGetKbdType())
+        let layouts = layoutManager.relevantLayoutIDs().compactMap {
+            KeyLayout.system(id: $0, keyboardType: keyboardType)
+        }
+        let currentLayoutID = layoutManager.currentLayoutID()
 
         // Key presses and pasteboard polling must not block the main run loop.
         replacementQueue.async { [weak self] in
             let outcome = ReplacementFlow.run(host: host, onlyLastWord: onlyLastWord) { text in
-                TextConverter.autoConvert(text, availableLayoutIDs: availableLayouts)
+                let result = TextConverter.convert(text, layouts: layouts, currentLayoutID: currentLayoutID)
+                // Only metadata: the text itself never reaches the log.
+                Logger.shared.log("Conversion: source=\(result.source.rawValue) len=\(text.count) "
+                    + "target=\(result.targetLayoutID ?? "none")")
+                return (result.converted, result.targetLayoutID)
             }
             host.restoreClipboard()
             DispatchQueue.main.async {

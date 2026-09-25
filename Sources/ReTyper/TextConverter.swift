@@ -1,77 +1,67 @@
 import Foundation
 
-/// Converts text typed in a wrong keyboard layout to the correct layout.
-/// Detection is based on the text content (Cyrillic vs Latin), NOT on the current keyboard layout.
-struct TextConverter {
-    
-    /// Detect whether text is predominantly Cyrillic or Latin
-    enum DetectedScript {
-        case cyrillic
-        case latin
-        case unknown
-    }
-    
-    /// Analyze text to determine its script
-    static func detectScript(_ text: String) -> DetectedScript {
-        var cyrillicCount = 0
-        var latinCount = 0
-        
-        for char in text {
-            if char.unicodeScalars.allSatisfy({ (0x0400...0x04FF).contains($0.value) }) {
-                cyrillicCount += 1
-            } else if char.unicodeScalars.allSatisfy({
-                (0x0041...0x005A).contains($0.value) || // A-Z
-                (0x0061...0x007A).contains($0.value)    // a-z
-            }) {
-                latinCount += 1
+/// How the direction of a conversion was decided. Logged instead of the text.
+enum DirectionSource: String {
+    case letters
+    case layoutOnlySymbols = "layout-only symbols"
+    case currentLayout = "current layout"
+    case undetermined
+}
+
+struct ConversionResult {
+    let converted: String
+    /// Nil when the direction could not be decided; the text is then unchanged.
+    let targetLayoutID: String?
+    let source: DirectionSource
+}
+
+/// Converts text typed with the wrong layout, key by key, using the selected system layouts.
+/// Pure: no Text Input Sources calls and no logging, so it runs on any queue.
+enum TextConverter {
+    static func convert(_ text: String, layouts: [KeyLayout], currentLayoutID: String) -> ConversionResult {
+        let unchanged = ConversionResult(converted: text, targetLayoutID: nil, source: .undetermined)
+        guard let latin = layouts.first(where: { $0.script == .latin }),
+              let cyrillic = layouts.first(where: { $0.script == .cyrillic }) else { return unchanged }
+
+        var latinLetters = 0
+        var cyrillicLetters = 0
+        for character in text {
+            switch Script.of(character) {
+            case .latin: latinLetters += 1
+            case .cyrillic: cyrillicLetters += 1
+            default: break
             }
         }
-        
-        if cyrillicCount > 0 && latinCount == 0 { return .cyrillic }
-        if latinCount > 0 && cyrillicCount == 0 { return .latin }
-        if cyrillicCount > latinCount { return .cyrillic }
-        if latinCount > cyrillicCount { return .latin }
-        return .unknown
-    }
-    
-    /// Auto-detect direction from the TEXT itself and convert.
-    /// - If text is Latin → convert to Cyrillic, return target Cyrillic layout ID
-    /// - If text is Cyrillic → convert to Latin, return target Latin layout ID
-    static func autoConvert(_ text: String, availableLayoutIDs: [String]) -> (converted: String, targetLayoutID: String?) {
-        let script = detectScript(text)
-        Logger.shared.log("   📝 Detected script: \(script) (len=\(text.count))")
-        
-        switch script {
-        case .latin:
-            // Text is Latin → convert to Cyrillic
-            // Find the first available Cyrillic layout
-            if let targetID = availableLayoutIDs.first(where: { CharacterMap.cyrillicLayout(for: $0) != nil }),
-               let cyrLayout = CharacterMap.cyrillicLayout(for: targetID) {
-                let converted = String(text.map { char in
-                    cyrLayout.fromEnglishMap[char] ?? char
-                })
-                return (converted, targetID)
+
+        let fromLatin: Bool
+        let source: DirectionSource
+        if latinLetters + cyrillicLetters > 0 {
+            guard latinLetters != cyrillicLetters else { return unchanged }
+            fromLatin = latinLetters > cyrillicLetters
+            source = .letters
+        } else {
+            // No letters: characters only one layout of the pair can type show where they came from.
+            let latinOnly = latin.characters.subtracting(cyrillic.characters)
+            let cyrillicOnly = cyrillic.characters.subtracting(latin.characters)
+            let hasLatinOnly = text.contains { latinOnly.contains($0) }
+            let hasCyrillicOnly = text.contains { cyrillicOnly.contains($0) }
+            if hasLatinOnly != hasCyrillicOnly {
+                fromLatin = hasLatinOnly
+                source = .layoutOnlySymbols
+            } else if hasLatinOnly {
+                return unchanged
+            } else if currentLayoutID == latin.id || currentLayoutID == cyrillic.id {
+                // Only shared symbols: they were typed with the layout that is active now.
+                fromLatin = currentLayoutID == latin.id
+                source = .currentLayout
+            } else {
+                return unchanged
             }
-            
-        case .cyrillic:
-            // Text is Cyrillic → convert to Latin
-            // Try each Cyrillic layout's reverse map to see which one matches best
-            for layoutID in availableLayoutIDs {
-                if let cyrLayout = CharacterMap.cyrillicLayout(for: layoutID) {
-                    let converted = String(text.map { char in
-                        cyrLayout.toEnglishMap[char] ?? char
-                    })
-                    // Find the Latin target layout
-                    if let latinID = availableLayoutIDs.first(where: { CharacterMap.isSupportedLatinTarget($0) }) {
-                        return (converted, latinID)
-                    }
-                }
-            }
-            
-        case .unknown:
-            break
         }
-        
-        return (text, nil)
+
+        let (from, to) = fromLatin ? (latin, cyrillic) : (cyrillic, latin)
+        let mapping = from.mapping(to: to)
+        let converted = String(text.map { mapping[$0] ?? $0 })
+        return ConversionResult(converted: converted, targetLayoutID: to.id, source: source)
     }
 }

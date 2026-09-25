@@ -279,7 +279,7 @@ final class PopoverViewController: NSViewController {
         
         let layouts = layoutManager.relevantLayoutIDs()
         for id in layouts {
-            let name = CharacterMap.displayName(for: id)
+            let name = LayoutCatalog.displayName(for: id)
             let badge = makeBadge(text: name)
             badgeStack.addArrangedSubview(badge)
         }
@@ -322,16 +322,16 @@ final class PopoverViewController: NSViewController {
         var cyrillicLayouts: [String] = []
         
         for id in allLayouts {
-            if CharacterMap.cyrillicLayout(for: id) != nil {
+            if LayoutCatalog.cyrillicLayout(for: id) != nil {
                 cyrillicLayouts.append(id)
-            } else if CharacterMap.isEnglishLayout(id) {
+            } else if LayoutCatalog.isLatinLayout(id) {
                 latinLayouts.append(id)
             }
         }
         
         // Get currently selected ones
-        let selectedLatin = activeLayouts.first(where: { CharacterMap.isEnglishLayout($0) })
-        let selectedCyrillic = activeLayouts.first(where: { CharacterMap.cyrillicLayout(for: $0) != nil })
+        let selectedLatin = activeLayouts.first(where: { LayoutCatalog.isLatinLayout($0) })
+        let selectedCyrillic = activeLayouts.first(where: { LayoutCatalog.cyrillicLayout(for: $0) != nil })
         
         // Latin header
         let latinHeader = NSMenuItem(title: "Latin", action: nil, keyEquivalent: "")
@@ -343,7 +343,7 @@ final class PopoverViewController: NSViewController {
         menu.addItem(latinHeader)
         
         for id in latinLayouts {
-            let name = CharacterMap.displayName(for: id)
+            let name = LayoutCatalog.displayName(for: id)
             // Get full display name from TIS
             let fullName = layoutDisplayName(for: id) ?? name
             let item = NSMenuItem(title: fullName, action: #selector(selectKeyboard(_:)), keyEquivalent: "")
@@ -365,7 +365,7 @@ final class PopoverViewController: NSViewController {
         menu.addItem(cyrillicHeader)
         
         for id in cyrillicLayouts {
-            let name = CharacterMap.displayName(for: id)
+            let name = LayoutCatalog.displayName(for: id)
             let fullName = layoutDisplayName(for: id) ?? name
             let item = NSMenuItem(title: fullName, action: #selector(selectKeyboard(_:)), keyEquivalent: "")
             item.target = self
@@ -388,11 +388,11 @@ final class PopoverViewController: NSViewController {
         
         if type == "latin" {
             // Replace the Latin layout
-            activeLayouts.removeAll { CharacterMap.isEnglishLayout($0) }
+            activeLayouts.removeAll { LayoutCatalog.isLatinLayout($0) }
             activeLayouts.insert(selectedID, at: 0)
         } else {
             // Replace the Cyrillic layout
-            activeLayouts.removeAll { CharacterMap.cyrillicLayout(for: $0) != nil }
+            activeLayouts.removeAll { LayoutCatalog.cyrillicLayout(for: $0) != nil }
             activeLayouts.append(selectedID)
         }
         

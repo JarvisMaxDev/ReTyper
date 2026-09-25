@@ -20,7 +20,7 @@ final class LayoutManager {
     
     /// Returns the display name for the current layout
     func currentLayoutDisplayName() -> String {
-        return CharacterMap.displayName(for: currentLayoutID())
+        return LayoutCatalog.displayName(for: currentLayoutID())
     }
     
     /// Returns all available keyboard layout IDs
@@ -61,7 +61,7 @@ final class LayoutManager {
         
         // Auto-detect: find first Latin and first Cyrillic
         return availableLayoutIDs().filter { id in
-            CharacterMap.isEnglishLayout(id) || CharacterMap.cyrillicLayout(for: id) != nil
+            LayoutCatalog.isLatinLayout(id) || LayoutCatalog.cyrillicLayout(for: id) != nil
         }
     }
     
@@ -89,15 +89,15 @@ final class LayoutManager {
         let current = currentLayoutID()
         let available = relevantLayoutIDs()
         
-        if CharacterMap.isEnglishLayout(current) {
+        if LayoutCatalog.isLatinLayout(current) {
             // Switch to first available Cyrillic
-            if let target = available.first(where: { CharacterMap.cyrillicLayout(for: $0) != nil }) {
+            if let target = available.first(where: { LayoutCatalog.cyrillicLayout(for: $0) != nil }) {
                 switchTo(layoutID: target)
                 return target
             }
         } else {
             // Switch to English
-            if let target = available.first(where: { CharacterMap.isEnglishLayout($0) }) {
+            if let target = available.first(where: { LayoutCatalog.isLatinLayout($0) }) {
                 switchTo(layoutID: target)
                 return target
             }
