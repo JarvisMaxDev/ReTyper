@@ -252,7 +252,7 @@ FR-011, SC-002)
     - that signing was ad-hoc because the «ReTyper Dev» identity is absent locally; CI signs with it.
   - Any failure blocks the rest.
 - [X] T026 `open ReTyper.app` (the release candidate from T025, not `./build.sh`) and confirm the menu bar indicator; re-grant Accessibility and Input Monitoring if the new ad-hoc signature asks. Take a fresh screenshot of the popover with «Active Keyboards» (PL + RU) and save it as `specs/002-symbol-conversion/screenshots/popover.png`.
-- [ ] T027 Owner runs, on the T026 candidate, the manual scenarios from [quickstart.md §3](./quickstart.md#3-ручная-проверка-выполняет-владелец):
+- [X] T027 Owner runs, on the T026 candidate, the manual scenarios from [quickstart.md §3](./quickstart.md#3-ручная-проверка-выполняет-владелец):
   - Scenarios 1–8 (no selection) in TextEdit, Safari, Telegram, Visual Studio Code and OpenChamber (SC-001).
   - Scenarios 9–11 in TextEdit and Safari: user selection, empty input, multi-type clipboard with RTF plus text (constitution, process item 5).
   - A fresh screenshot of a field after scenario 1 goes to `specs/002-symbol-conversion/screenshots/scenario-1.png`.
@@ -261,7 +261,7 @@ FR-011, SC-002)
   - `Conversion: source=… len=… target=…` lines exist.
   - `grep -n -F -e '^)' -e ':)' -e 'Ghbdtn' -e 'Привет' -e 'abc' ~/Library/Caches/com.retyper.app/retyper.log` finds no user text; review any hit manually.
   - Record the result in `specs/002-symbol-conversion/verification.md`.
-- [ ] T029 Report to the owner from `specs/002-symbol-conversion/verification.md`: changed files, test/build/manual results and the R8 behavior changes.
+- [X] T029 Report to the owner from `specs/002-symbol-conversion/verification.md`: changed files, test/build/manual results and the R8 behavior changes.
   - Commit and push only after an explicit request; the suggested message is `feat: convert symbols using system keyboard layouts`. Warn before pushing: a push to `main` starts the release pipeline.
   - Before committing (constitution, process item 7): `git config user.name` must print `Jarvis` and `git config user.email` must print `jarvis.max.dev@proton.me`; otherwise stop and ask the owner. After committing, `git log -1 --format='%an <%ae> | %cn <%ce>'` must print Jarvis for both author and committer.
   - After a requested push, wait for CI of that revision (`gh run list --commit <sha>`, `gh run watch <id>`) and record the outcome in `verification.md`.

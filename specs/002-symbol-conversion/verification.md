@@ -152,3 +152,30 @@ Monitoring OK, Double ⌥, «Switch Only Last Word» выключен, стро�
 Владелец прямо поручил коммит от Jarvis, пуш в `main` и ожидание CI. Выпуск идёт с проверкой в
 стенде (11/11 дважды), OpenChamber и Telegram. TextEdit, Safari и VS Code вручную **не
 проверялись** (SC-001 выполнен частично) — по решению владельца, T027 остаётся открытой.
+
+## Выпуск v0.10.0, 2026-09-25
+
+| Проверка | Результат |
+|----------|-----------|
+| Identity перед коммитом | `git config`: Jarvis / jarvis.max.dev@proton.me; SSH к GitHub: `JarvisMaxDev` |
+| Коммиты | `a8feef2` docs: поправка конституции 6.0.0; `e4cb029` feat: преобразование символов. Author и committer обоих — `Jarvis <jarvis.max.dev@proton.me>`. Первая версия docs-коммита случайно захватила два `git mv`-переименования из индекса; до пуша пересобрана, чтобы содержать только конституцию |
+| Пуш | `4164088..e4cb029 main -> main` |
+| CI `Build & Release`, run 36131096089 | success. `build`: `swift test` — 81 XCTest, 0 падений, включая `KeyLayoutReferenceTests` на `macos-14`; тест упаковки, сборки arm64/x86_64, Universal Binary, DMG. `release`: semantic-release, обновление Cask |
+| Релиз | `v0.10.0`, опубликован 2026-09-25T11:48:05Z: `ReTyper-macOS-universal.dmg` (1 515 813 байт), `ReTyper-macOS-universal.zip` (1 228 372 байт) |
+| Опубликованный ZIP | `CFBundleShortVersionString`/`CFBundleVersion` 0.10.0, `com.retyper.app`, `LSMinimumSystemVersion` 12.0, `x86_64 arm64`, `codesign --verify --deep --strict` OK, Authority «ReTyper Dev» |
+| Опубликованный DMG | 0.10.0, `x86_64 arm64`, `codesign --verify` OK; бинарник побайтно совпадает с ZIP |
+| Содержимое | в бинарнике есть `layout-only symbols` и `com.apple.keylayout.Byelorussian`; строк старых таблиц (`englishToRussian`) нет |
+| Homebrew | `JarvisMaxDev/homebrew-tap` `Casks/retyper.rb`: `version "0.10.0"`, sha256 `3a9824…d311` совпадает с опубликованным DMG |
+
+Предупреждение CI (не ошибка): actions на Node.js 20 принудительно запускаются на Node.js 24.
+
+## TextEdit, Safari, VS Code (владелец, T027), 2026-09-25
+
+Владелец сообщил, что проверил `^)` + двойной ⌥ в TextEdit, Safari и VS Code — «готово». Журнал
+13:55–13:56: восемь замен, все `replaced` — `layout-only symbols` (вид `^)` → `:)`), `current
+layout` (вид `:)` → `^)`), `letters`. Какое приложение дало какую строку, журнал не содержит (по
+FR-013 пишутся только метаданные); принадлежность — со слов владельца. Журнал целиком (1577
+строк) — только служебные строки, набранного текста нет.
+
+SC-001 проверен во всех пяти приложениях: TextEdit, Safari, Telegram, VS Code (владелец, с
+v0.10.0-кандидатом, собранным локально из той же ревизии) и OpenChamber.
