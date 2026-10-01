@@ -1,0 +1,9 @@
+{
+  "failure" : "Abort(reason: \"Test recipient changed; no further input sent\")",
+  "fixture" : "\/private\/var\/folders\/jf\/96nbx4_n3ksb0p99q8_ph5xm0000gn\/T\/opencode\/retyper-004\/repro.txt",
+  "passed" : 0,
+  "pid" : 47152,
+  "results" : [
+
+  ]
+}

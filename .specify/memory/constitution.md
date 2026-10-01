@@ -1,27 +1,39 @@
 <!--
 Sync Impact Report
+- Current amendment: 7.0.0 -> 8.0.0, 2026-10-01 (principle III, narrowly scoped VS Code metadata probe).
+- Approval: after the proposed probe-copy exception and 80/80 controlled text checks, the owner
+  directed the agent to experiment, change the application and achieve a usable result.
+- Only the validated VS Code editor context may probe-copy despite an unreliable AX zero range.
+- Fresh versioned single-selection metadata is mandatory before any replacement; line-copy,
+  missing/malformed metadata, secure input, terminal fields and changed context never allow paste.
+- No new permissions, text storage, network transfer or preliminary deletion. Remaining principles
+  and release gates are unchanged. The previous sync report below is historical.
 - Base: ratified constitution 1.0.0 from main, commit 7f5465d
-- Version change: 5.0.0 -> 6.0.0 (MAJOR: principle II redefined)
-- Reason 2026-09-25: feature 002 converts symbols as well as letters. Hand-written tables were
-  incomplete (no Shift+digit symbols for Apple variants) and disagreed with macOS in places
-  (ISO `§` key, Apple Russian `/`). The maintainer chose system layouts with no fallback table
-  and explicitly requested this amendment
-- Modified principle II (title unchanged): mappings come from the macOS data of the layouts
-  selected in ReTyper for the current keyboard type; hand-written tables are forbidden, including
-  as a fallback; layouts without key data are excluded; collisions follow one fixed rule; tests
-  verify reference layouts on ANSI and ISO and fail rather than skip when a layout is missing
-- Modified process item 4: no longer names CharacterMap/TextConverter; refers to building mappings
-  and direction detection
-- Added section: "Поправка 2026-09-25: соответствия из системных раскладок"
+- Version change: 6.0.0 -> 7.0.0 (MAJOR: principle III redefined)
+- Reason 2026-09-29: feature 003 replaces text in terminals. A terminal command line cannot be
+  selected with editing keys and pasting does not replace a selection there. The maintainer chose
+  "remember what was typed" (Q1: A), standalone terminals first (Q2: B), and approved the amendment
+  text from the feature 003 plan ("одобряю поправку")
+- Modified principle III (title unchanged): selection/paste rules now apply "outside terminals";
+  new terminal path for an explicit list of end-to-end verified terminals: source is the fragment
+  typed after the last reset action, removal by exactly one Backspace per remembered character,
+  a started series is completed, user input inside the series is a documented limitation that is
+  detected and logged without text; secure fields and enabled secure input stay layout-only
+- Modified principle I: a typed terminal fragment MAY be kept in memory for one replacement,
+  bounded, cleared on reset and exit, never written to disk, log or clipboard
+- Editorial beyond the plan text: the paste-over-selection sentence and the "user types during the
+  operation" sentence of principle III are also prefixed "outside terminals", otherwise they would
+  contradict the new terminal path
+- Added section: "Поправка 2026-09-29: замена в терминалах"
 - Removed sections: none
-- Unchanged: principles I, III, IV, V, product constraints, remaining process items, governance,
-  minimum OS, bundle identity and preferences
-- History: amendments 2.0.0-5.0.0 retained below; both one-release exceptions have expired
-- Migration: none for preferences; conversion results change where old tables disagreed with
-  macOS, listed by the feature 002 plan before implementation
+- Unchanged: principles II, IV, V, product constraints, process items, governance, minimum OS,
+  bundle identity and preferences
+- History: amendments 2.0.0-6.0.0 retained below; both one-release exceptions have expired.
+  The 6.0.0 pending sync of README "Supported Layouts" was completed with feature 002 (v0.10.0)
+- Migration: none for preferences; in listed terminals the hotkey now replaces typed text
 - Templates: plan/spec/tasks templates read the constitution at runtime; no template changes needed
-- Pending sync (not done by this amendment): README.md "Supported Layouts" and the limitation about
-  US/ABC/Polish Pro targets describe the table-based behaviour and must be updated with feature 002
+- Pending sync (not done by this amendment): README "Known limitations" still says terminals only
+  switch the layout; update with feature 003 implementation
 -->
 # ReTyper Constitution
 
@@ -34,7 +46,11 @@ ReTyper MUST обрабатывать клавиатурные события, �
 ссылки MAY открываться только по явному действию пользователя и MUST NOT содержать введённые
 данные. Диагностические логи MUST NOT включать исходный или преобразованный текст, содержимое
 буфера обмена, последовательности нажатий либо данные, позволяющие восстановить ввод; допустимы
-только длины, идентификаторы раскладок, переходы состояния и очищенные ошибки. Это требование
+только длины, идентификаторы раскладок, переходы состояния и очищенные ошибки.
+Текст, который пользователь печатает в терминале с поддержкой замены (принцип III), MAY временно
+храниться в памяти процесса для одной замены. Он MUST быть ограничен по длине, MUST очищаться при
+сбросе и выходе, MUST NOT записываться на диск, в журнал или буфер обмена и MUST NOT передаваться
+куда-либо, кроме синтетического ввода в тот же терминал. Это требование
 необходимо, потому что приложение получает разрешения Accessibility и Input Monitoring и тем
 самым работает с особо чувствительными данными.
 
@@ -67,18 +83,47 @@ PC русской и украинской, белорусской, US, ABC, Poli
 только от клавиатурных событий: движение мыши и отпускание других клавиш MUST NOT отменять жест.
 Синтетические события ReTyper MUST быть исключены из собственного мониторинга ввода.
 
-Источником текста MAY быть только текущее выделение: выделение пользователя либо выделение,
+Вне терминалов источником текста MAY быть только текущее выделение: выделение пользователя либо выделение,
 созданное ReTyper стандартными клавишами редактора. Если поле через Accessibility сообщает, что
-выделения нет, копирование MUST NOT выполняться: часть редакторов в этом случае копирует всю
+выделения нет, копирование MUST NOT выполняться (кроме узкого протокола метаданных ниже): часть редакторов в этом случае копирует всю
 строку. Если копирование не изменило буфер обмена, его прежнее содержимое MUST NOT использоваться
 как текст; операция ограничивается сменой раскладки. Выделение, созданное ReTyper и не
 использованное для замены, MUST сниматься. Выделение пользователя, которое не удалось
 скопировать, MUST оставаться нетронутым.
 
-Замена MUST выполняться вставкой поверх выделения; отдельное предварительное удаление и удаление
-по предполагаемому числу нажатий Backspace MUST NOT использоваться. Если пользователь печатает
-или переключает приложение во время операции, вставка MUST NOT выполняться. В терминалах и
-защищённых полях (secure text) замена MUST NOT выполняться; допускается только смена раскладки.
+Исключение для проверенного редакторного поля VS Code: если AX публикует недостоверный диапазон,
+MAY выполняться пробное копирование для получения свежих `vscode-editor-data`. Источником текста
+MAY стать только непустой результат с поддержанной версией метаданных и строгим булевым
+`isFromEmptySelection=false`, без многокурсорного результата. Результат с
+`isFromEmptySelection=true` означает копирование строки без выделения: этот текст MUST NOT
+преобразовываться или вставляться. После него MAY создаваться обычное выделение клавишами,
+которое MUST подтверждаться новым копированием и метаданными настоящего выделения.
+Отсутствие, некорректность или неоднозначность метаданных MUST отменять замену; возврат к слепому
+copy/paste запрещён. Протокол MUST быть ограничен подтверждённым полем редактора и неизменным
+получателем; встроенные терминалы и защищённый ввод исключены. Снимок и восстановление clipboard,
+запрет предварительного удаления и защитные требования к вставке сохраняются. Неопределённый
+результат пробного копирования не разрешает двигать каретку ради cleanup; снятие собственного
+выделения допускается только при подтверждённом выделении и исходном контексте.
+
+Вне терминалов замена MUST выполняться вставкой поверх выделения; отдельное предварительное
+удаление и удаление по предполагаемому числу нажатий Backspace MUST NOT использоваться. Если
+пользователь печатает или переключает приложение во время операции, вставка MUST NOT выполняться.
+В защищённых полях (secure text) и при включённом защищённом вводе замена MUST NOT выполняться;
+допускается только смена раскладки.
+
+Терминалы — отдельный путь. Замена разрешена только в терминалах из явного списка, для каждого из
+которых пройдена сквозная проверка; в остальных терминалах и во встроенных терминалах редакторов
+допускается только смена раскладки. В терминале из списка источником текста MAY быть только
+фрагмент, который пользователь напечатал с клавиатуры в текущей строке после последнего
+сбрасывающего действия. Любое действие, после которого содержимое строки нельзя знать точно
+(перемещение курсора, Tab, Enter, сочетания с модификаторами, вставка, мышь, смена приложения,
+мёртвая клавиша, превышение предела длины), MUST сбрасывать фрагмент. Замена MUST выполняться
+удалением ровно этого фрагмента (или его последнего слова) Backspace — по одному нажатию на
+запомненный символ — и вводом преобразованного текста; удаление по предполагаемому числу символов
+остаётся запрещённым. Перед заменой MUST проверяться, что приложение и фрагмент не изменились.
+Начатая серия удаления и ввода MUST доводиться до конца. Нажатие пользователя внутри серии может
+исказить результат; это документированное ограничение, оно MUST обнаруживаться и записываться в
+журнал без текста.
 
 Буфер обмена MAY временно использоваться для копирования и вставки. Перед первым копированием
 MUST сохраняться всё его содержимое, а после операции оно MUST возвращаться, если за это время
@@ -308,6 +353,29 @@ macOS: на клавиатуре ISO буква `ё` стоит на клави�
 минимальная версия системы и архитектуры не меняются; миграция данных не требуется. Это
 MAJOR-поправка 6.0.0, поскольку принцип переопределён несовместимо.
 
+## Поправка 2026-09-29: замена в терминалах
+
+Владелец попросил, чтобы хоткей исправлял текст и в терминале
+([спецификация 003](../../specs/003-terminal-support/spec.md)). В терминале нельзя выделить
+командную строку клавишами и заменить выделенное вставкой, поэтому прежний принцип III запрещал там
+замену. Владелец выбрал источник «запоминать набранное» (Q1: A) и начать с отдельных терминалов
+(Q2: B), затем прямо одобрил текст поправки из
+[плана фичи 003](../../specs/003-terminal-support/plan.md#предлагаемая-поправка-конституции-700)
+словами «одобряю поправку».
+
+Принцип III переопределён: для терминалов из явного проверенного списка добавлен отдельный путь —
+источник текста — фрагмент, набранный после последнего сброса; удаление точным числом Backspace;
+серия доводится до конца; нажатие пользователя внутри серии — документированное ограничение, которое
+обнаруживается и пишется в журнал без текста. Правила выделения и вставки ограничены словами «вне
+терминалов»; запрет замены в защищённых полях сохранён и распространён на включённый защищённый
+ввод. Принцип I разрешает временно хранить набранный в терминале фрагмент в памяти с ограничениями.
+Остальные принципы и требования к проверке не меняются.
+
+Совместимость: ключи и формат настроек, bundle ID, минимальная версия системы и архитектуры не
+меняются; миграция данных не требуется. В обычных приложениях поведение прежнее. В терминалах из
+списка хоткей начинает заменять набранный текст там, где раньше только переключал раскладку. Это
+MAJOR-поправка 7.0.0, поскольку принцип III переопределён несовместимо.
+
 ## Governance
 
 Эта конституция имеет приоритет над README, локальными привычками и отдельными планами. Все
@@ -333,4 +401,18 @@ MAJOR-поправка 6.0.0, поскольку принцип переопре
 обязательного шага, локальные результаты и доказательство удалённого прогона учитываются
 раздельно в задачах и отчёте; добавление шага само по себе не является успешным CI-прогоном.
 
-**Version**: 6.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-09-25
+## Поправка 2026-10-01: метаданные редакторного копирования
+
+Исследование 004 показало, что подготовка доступности не восстанавливает уже существующее
+выделение: вспомогательный элемент редактора пересоздаётся с нулевым диапазоном. Контролируемый
+прототип по метаданным копирования прошёл 80/80 проверок текста, включая частичное выделение
+после холодного запуска. После предложения узкого исключения владелец поручил менять и
+экспериментировать до получения работающего приложения. Принцип III допускает именно этот
+ограниченный протокол, а не отмену проверок выделения для всех приложений.
+
+Данные текста остаются локальными; пользовательские настройки и разрешения не меняются.
+Новая функция не объявлена выпущенной этой поправкой. Интеграция, отмена при смене фокуса,
+неверные метаданные и свежая проверка кандидата обязательны. Миграция настроек не требуется.
+Версия 8.0.0 — MAJOR-переопределение допустимого источника подтверждения выделения.
+
+**Version**: 8.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-10-01

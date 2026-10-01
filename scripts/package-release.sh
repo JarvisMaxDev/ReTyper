@@ -75,7 +75,9 @@ verify_app() {
     for key in CFBundleShortVersionString CFBundleVersion; do
         [[ "$(/usr/libexec/PlistBuddy -c "Print :$key" "$app/Contents/Info.plist")" == "$version" ]] || fail "Wrong $key in $app"
     done
-    lipo "$app/Contents/MacOS/$executable" -verify_arch arm64 x86_64 || fail "Missing universal architectures in $app"
+    for arch in arm64 x86_64; do
+        lipo "$app/Contents/MacOS/$executable" -verify_arch "$arch" || fail "Missing $arch architecture in $app"
+    done
     codesign --verify --deep --strict --all-architectures "$app" || fail "Signature validation failed: $app"
     if [[ "$app" != "$staged_app" ]]; then
         diff -r "$staged_app" "$app" || fail "$app differs from signed staging"

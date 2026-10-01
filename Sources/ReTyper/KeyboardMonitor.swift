@@ -16,6 +16,12 @@ final class KeyboardMonitor {
 
     /// Real key presses seen so far; a running replacement compares it to notice typing.
     private(set) var userKeyDownCount = 0
+    /// Invalidates an in-flight replacement, independently of modifier gesture recognition.
+    private(set) var contextRevision = 0
+    /// A later user Copy/Cut owns the clipboard even if it came from another editor window.
+    private(set) var clipboardShortcutCount = 0
+
+    func invalidateContext() { contextRevision &+= 1 }
 
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
@@ -39,7 +45,8 @@ final class KeyboardMonitor {
             CGEvent.tapEnable(tap: eventTap, enable: true)
             return
         }
-        let eventMask: CGEventMask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.flagsChanged.rawValue)
+        let eventTypes: [CGEventType] = [.keyDown, .flagsChanged, .leftMouseDown, .rightMouseDown, .otherMouseDown]
+        let eventMask = eventTypes.reduce(CGEventMask(0)) { $0 | (1 << $1.rawValue) }
         guard let tap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
@@ -87,6 +94,7 @@ final class KeyboardMonitor {
                 Logger.shared.log("🔄 CGEventTap re-enabled (was disabled by system)")
             }
             detector.disarm()
+            invalidateContext()
             return
         }
         guard !Self.isSynthetic(event) else { return }
@@ -94,8 +102,15 @@ final class KeyboardMonitor {
         switch type {
         case .keyDown:
             userKeyDownCount += 1
+            invalidateContext()
+            if Self.isClipboardShortcut(keyCode: event.getIntegerValueField(.keyboardEventKeycode), flags: event.flags) {
+                clipboardShortcutCount &+= 1
+            }
             // A modifier pressed around another key is a shortcut, not the hotkey.
             detector.disarm()
+        case .leftMouseDown, .rightMouseDown, .otherMouseDown:
+            // A click cancels a pending replacement, not the modifier hotkey itself.
+            invalidateContext()
         case .flagsChanged:
             let keyCode = UInt16(truncatingIfNeeded: event.getIntegerValueField(.keyboardEventKeycode))
             if detector.handle(keyCode: keyCode, flags: event.flags, modifier: settings.hotkeyModifier,
@@ -110,6 +125,10 @@ final class KeyboardMonitor {
     static func isSynthetic(_ event: CGEvent) -> Bool {
         event.getIntegerValueField(.eventSourceUserData) == syntheticEventMarker
             || event.getIntegerValueField(.eventSourceUnixProcessID) == Int64(getpid())
+    }
+
+    static func isClipboardShortcut(keyCode: Int64, flags: CGEventFlags) -> Bool {
+        flags.contains(.maskCommand) && (keyCode == 8 || keyCode == 7)
     }
 
     // MARK: - Synthetic Key Presses

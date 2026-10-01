@@ -1,0 +1,36 @@
+{
+  "failure" : "Abort(reason: \"Scenario mismatch: partial-backward\")",
+  "fixture" : "\/private\/var\/folders\/jf\/96nbx4_n3ksb0p99q8_ph5xm0000gn\/T\/opencode\/retyper-native\/native-retyper-probe.txt",
+  "passed" : 1,
+  "pid" : 16332,
+  "results" : [
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "expected" : "prefix привет suffix",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 09:23:19.477] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.010850333143025637,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.78904233314096928,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : false,
+      "expected" : "prefix привет suffix",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 09:23:22.015] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.024315041489899158,
+      "pass" : false,
+      "savedDocumentObservedAfterGestureSeconds" : 0.80040454166010022,
+      "scenario" : "partial-backward"
+    }
+  ]
+}

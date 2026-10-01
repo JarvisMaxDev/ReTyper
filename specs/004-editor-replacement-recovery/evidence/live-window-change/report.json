@@ -1,0 +1,10 @@
+[
+  {
+    "clipboard" : true,
+    "injected" : true,
+    "otherField" : true,
+    "outcome" : "[2026-10-01 09:33:56.344] Replacement outcome: layoutOnly(reason: \"context changed\")",
+    "pass" : true,
+    "scenario" : "window-change"
+  }
+]

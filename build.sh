@@ -1,6 +1,6 @@
 #!/bin/bash
 # Build ReTyper and create .app bundle
-set -e
+set -euo pipefail
 
 PROJ_DIR="$(cd "$(dirname "$0")" && pwd)"
 APP_DIR="$PROJ_DIR/ReTyper.app"
@@ -9,11 +9,16 @@ MACOS_DIR="$CONTENTS_DIR/MacOS"
 
 echo "🔨 Building..."
 cd "$PROJ_DIR"
-swift build
+# Use the same engine for building and resolving its output directory. Xcode 27's new default
+# engine uses a different directory; the old hard-coded path can silently package a stale binary.
+BUILD_SYSTEM="${RETYPER_BUILD_SYSTEM:-native}"
+swift build --build-system "$BUILD_SYSTEM"
+BIN_DIR="$(swift build --build-system "$BUILD_SYSTEM" --show-bin-path)"
+test -x "$BIN_DIR/ReTyper" || { echo "Built executable not found: $BIN_DIR/ReTyper" >&2; exit 1; }
 
 echo "📦 Creating .app bundle..."
 mkdir -p "$MACOS_DIR"
-cp .build/debug/ReTyper "$MACOS_DIR/ReTyper"
+cp "$BIN_DIR/ReTyper" "$MACOS_DIR/ReTyper"
 cp "$APP_DIR/Contents/Info.plist" "$CONTENTS_DIR/Info.plist" 2>/dev/null || true
 
 echo "🎨 Copying resources..."
@@ -31,4 +36,3 @@ echo "  open $APP_DIR"
 echo ""
 echo "Or to run from terminal:"
 echo "  $MACOS_DIR/ReTyper"
-

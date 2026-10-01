@@ -1,0 +1,10 @@
+{
+  "label" : "after-second",
+  "pid" : 27306,
+  "rangeLength" : 0,
+  "rangeLocation" : 0,
+  "role" : "AXTextArea",
+  "selectedTextLength" : 0,
+  "unavailableLabel" : false,
+  "valueLength" : 20
+}

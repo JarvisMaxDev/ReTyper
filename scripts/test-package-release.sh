@@ -98,7 +98,9 @@ assert_app() {
     for key in CFBundleShortVersionString CFBundleVersion; do
         [[ "$(/usr/libexec/PlistBuddy -c "Print :$key" "$app/Contents/Info.plist")" == "$version" ]] || fail "Wrong $key in $app"
     done
-    lipo "$app/Contents/MacOS/ReTyper" -verify_arch arm64 x86_64
+    for arch in arm64 x86_64; do
+        lipo "$app/Contents/MacOS/ReTyper" -verify_arch "$arch"
+    done
     codesign --verify --deep --strict --all-architectures "$app"
     diff -r "$reference" "$app"
     [[ -L "$app/Contents/Resources/alias.txt" && "$(readlink "$app/Contents/Resources/alias.txt")" == payload.txt ]] || fail 'Symlink was not preserved'

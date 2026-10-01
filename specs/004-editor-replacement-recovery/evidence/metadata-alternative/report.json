@@ -1,0 +1,962 @@
+[
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 1,
+    "scenario" : "partial-forward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 1,
+    "scenario" : "partial-backward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 1,
+    "scenario" : "partial-word-mode"
+  },
+  {
+    "actual" : "привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 1,
+    "scenario" : "whole-line"
+  },
+  {
+    "actual" : "ghbdtn",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "ghbdtn",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 1,
+    "scenario" : "line-start"
+  },
+  {
+    "actual" : "",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 1,
+    "scenario" : "empty"
+  },
+  {
+    "actual" : "hello привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "hello привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 1,
+    "scenario" : "last-word"
+  },
+  {
+    "actual" : ":)",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : ":)",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 1,
+    "scenario" : "symbols"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 2,
+    "scenario" : "partial-forward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 2,
+    "scenario" : "partial-backward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 2,
+    "scenario" : "partial-word-mode"
+  },
+  {
+    "actual" : "привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 2,
+    "scenario" : "whole-line"
+  },
+  {
+    "actual" : "ghbdtn",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "ghbdtn",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 2,
+    "scenario" : "line-start"
+  },
+  {
+    "actual" : "",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 2,
+    "scenario" : "empty"
+  },
+  {
+    "actual" : "hello привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "hello привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 2,
+    "scenario" : "last-word"
+  },
+  {
+    "actual" : ":)",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : ":)",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 2,
+    "scenario" : "symbols"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 3,
+    "scenario" : "partial-forward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 3,
+    "scenario" : "partial-backward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 3,
+    "scenario" : "partial-word-mode"
+  },
+  {
+    "actual" : "привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 3,
+    "scenario" : "whole-line"
+  },
+  {
+    "actual" : "ghbdtn",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "ghbdtn",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 3,
+    "scenario" : "line-start"
+  },
+  {
+    "actual" : "",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 3,
+    "scenario" : "empty"
+  },
+  {
+    "actual" : "hello привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "hello привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 3,
+    "scenario" : "last-word"
+  },
+  {
+    "actual" : ":)",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : ":)",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 3,
+    "scenario" : "symbols"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 4,
+    "scenario" : "partial-forward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 4,
+    "scenario" : "partial-backward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 4,
+    "scenario" : "partial-word-mode"
+  },
+  {
+    "actual" : "привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 4,
+    "scenario" : "whole-line"
+  },
+  {
+    "actual" : "ghbdtn",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "ghbdtn",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 4,
+    "scenario" : "line-start"
+  },
+  {
+    "actual" : "",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 4,
+    "scenario" : "empty"
+  },
+  {
+    "actual" : "hello привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "hello привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 4,
+    "scenario" : "last-word"
+  },
+  {
+    "actual" : ":)",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : ":)",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 4,
+    "scenario" : "symbols"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 5,
+    "scenario" : "partial-forward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 5,
+    "scenario" : "partial-backward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 5,
+    "scenario" : "partial-word-mode"
+  },
+  {
+    "actual" : "привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 5,
+    "scenario" : "whole-line"
+  },
+  {
+    "actual" : "ghbdtn",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "ghbdtn",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 5,
+    "scenario" : "line-start"
+  },
+  {
+    "actual" : "",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 5,
+    "scenario" : "empty"
+  },
+  {
+    "actual" : "hello привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "hello привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 5,
+    "scenario" : "last-word"
+  },
+  {
+    "actual" : ":)",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : ":)",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 5,
+    "scenario" : "symbols"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 6,
+    "scenario" : "partial-forward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 6,
+    "scenario" : "partial-backward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 6,
+    "scenario" : "partial-word-mode"
+  },
+  {
+    "actual" : "привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 6,
+    "scenario" : "whole-line"
+  },
+  {
+    "actual" : "ghbdtn",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "ghbdtn",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 6,
+    "scenario" : "line-start"
+  },
+  {
+    "actual" : "",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 6,
+    "scenario" : "empty"
+  },
+  {
+    "actual" : "hello привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "hello привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 6,
+    "scenario" : "last-word"
+  },
+  {
+    "actual" : ":)",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : ":)",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 6,
+    "scenario" : "symbols"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 7,
+    "scenario" : "partial-forward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 7,
+    "scenario" : "partial-backward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 7,
+    "scenario" : "partial-word-mode"
+  },
+  {
+    "actual" : "привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 7,
+    "scenario" : "whole-line"
+  },
+  {
+    "actual" : "ghbdtn",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "ghbdtn",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 7,
+    "scenario" : "line-start"
+  },
+  {
+    "actual" : "",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 7,
+    "scenario" : "empty"
+  },
+  {
+    "actual" : "hello привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "hello привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 7,
+    "scenario" : "last-word"
+  },
+  {
+    "actual" : ":)",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : ":)",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 7,
+    "scenario" : "symbols"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 8,
+    "scenario" : "partial-forward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 8,
+    "scenario" : "partial-backward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 8,
+    "scenario" : "partial-word-mode"
+  },
+  {
+    "actual" : "привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 8,
+    "scenario" : "whole-line"
+  },
+  {
+    "actual" : "ghbdtn",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "ghbdtn",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 8,
+    "scenario" : "line-start"
+  },
+  {
+    "actual" : "",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 8,
+    "scenario" : "empty"
+  },
+  {
+    "actual" : "hello привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "hello привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 8,
+    "scenario" : "last-word"
+  },
+  {
+    "actual" : ":)",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : ":)",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 8,
+    "scenario" : "symbols"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 9,
+    "scenario" : "partial-forward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 9,
+    "scenario" : "partial-backward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 9,
+    "scenario" : "partial-word-mode"
+  },
+  {
+    "actual" : "привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 9,
+    "scenario" : "whole-line"
+  },
+  {
+    "actual" : "ghbdtn",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "ghbdtn",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 9,
+    "scenario" : "line-start"
+  },
+  {
+    "actual" : "",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 9,
+    "scenario" : "empty"
+  },
+  {
+    "actual" : "hello привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "hello привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 9,
+    "scenario" : "last-word"
+  },
+  {
+    "actual" : ":)",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : ":)",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 9,
+    "scenario" : "symbols"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 10,
+    "scenario" : "partial-forward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 10,
+    "scenario" : "partial-backward"
+  },
+  {
+    "actual" : "prefix привет suffix",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "prefix привет suffix",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 10,
+    "scenario" : "partial-word-mode"
+  },
+  {
+    "actual" : "привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 10,
+    "scenario" : "whole-line"
+  },
+  {
+    "actual" : "ghbdtn",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "ghbdtn",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 10,
+    "scenario" : "line-start"
+  },
+  {
+    "actual" : "",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "",
+    "outcome" : "nothing-selected",
+    "pass" : true,
+    "repeat" : 10,
+    "scenario" : "empty"
+  },
+  {
+    "actual" : "hello привет",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : "hello привет",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 10,
+    "scenario" : "last-word"
+  },
+  {
+    "actual" : ":)",
+    "axBefore" : [
+      0,
+      0
+    ],
+    "expected" : ":)",
+    "outcome" : "replaced",
+    "pass" : true,
+    "repeat" : 10,
+    "scenario" : "symbols"
+  }
+]

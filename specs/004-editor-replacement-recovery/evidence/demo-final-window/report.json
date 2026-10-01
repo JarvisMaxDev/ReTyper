@@ -1,0 +1,25 @@
+{
+  "failure" : null,
+  "fixture" : "\/private\/var\/folders\/jf\/96nbx4_n3ksb0p99q8_ph5xm0000gn\/T\/opencode\/retyper-004\/repro.txt",
+  "passed" : 1,
+  "pid" : 47152,
+  "results" : [
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 09:41:44.925] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.058238208759576082,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84228416671976447,
+      "scenario" : "partial-forward"
+    }
+  ]
+}

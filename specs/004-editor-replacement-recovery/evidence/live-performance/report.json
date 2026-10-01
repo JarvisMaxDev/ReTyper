@@ -1,0 +1,20 @@
+{
+  "failure" : "Abort(reason: \"Scenario mismatch: hundred-characters\")",
+  "fixture" : "\/private\/var\/folders\/jf\/96nbx4_n3ksb0p99q8_ph5xm0000gn\/T\/opencode\/retyper-004\/repro.txt",
+  "passed" : 0,
+  "pid" : 47152,
+  "results" : [
+    {
+      "actual" : "фффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффф",
+      "clipboard" : true,
+      "expected" : "фффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффф",
+      "iteration" : 1,
+      "layout" : false,
+      "outcome" : "[2026-10-01 09:20:36.051] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.09148175036534667,
+      "pass" : false,
+      "savedDocumentObservedAfterGestureSeconds" : 0.21044037491083145,
+      "scenario" : "hundred-characters"
+    }
+  ]
+}

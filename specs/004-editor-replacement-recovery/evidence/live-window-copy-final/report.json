@@ -1,0 +1,18 @@
+[
+  {
+    "clipboard" : true,
+    "injected" : true,
+    "otherField" : true,
+    "outcome" : "[2026-10-01 09:37:29.826] Replacement outcome: layoutOnly(reason: \"context changed\")",
+    "pass" : true,
+    "scenario" : "window-change"
+  },
+  {
+    "clipboard" : true,
+    "injected" : true,
+    "otherField" : true,
+    "outcome" : "[2026-10-01 09:37:32.139] Replacement outcome: layoutOnly(reason: \"context changed\")",
+    "pass" : true,
+    "scenario" : "foreign-editor-copy"
+  }
+]

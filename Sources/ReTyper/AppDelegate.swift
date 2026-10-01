@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var isReplacing = false
     
     private var retryTimer: Timer?
+    private var activationObserver: NSObjectProtocol?
 
     /// Terminals cannot select a command line with the keyboard, so they only switch the layout.
     static let terminalBundleIDs: Set<String> = [
@@ -42,6 +43,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Start monitoring keyboard (will trigger Input Monitoring prompt)
         keyboardMonitor.start()
+        activationObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
+        ) { [weak self] _ in self?.keyboardMonitor.invalidateContext() }
         
         // If monitor didn't start, prompt for Input Monitoring and retry
         if !keyboardMonitor.isRunning {
@@ -73,6 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         keyboardMonitor.stop()
         layoutManager.stopObserving()
+        if let activationObserver { NSWorkspace.shared.notificationCenter.removeObserver(activationObserver) }
     }
     
     // MARK: - Hotkey Handler
@@ -96,15 +101,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             KeyLayout.system(id: $0, keyboardType: keyboardType)
         }
         let currentLayoutID = layoutManager.currentLayoutID()
+        let usesEditorMetadata = app.bundleIdentifier == "com.microsoft.VSCode"
 
         // Key presses and pasteboard polling must not block the main run loop.
         replacementQueue.async { [weak self] in
-            let outcome = ReplacementFlow.run(host: host, onlyLastWord: onlyLastWord) { text in
+            let convert: (String) -> (converted: String, targetLayoutID: String?) = { text in
                 let result = TextConverter.convert(text, layouts: layouts, currentLayoutID: currentLayoutID)
                 // Only metadata: the text itself never reaches the log.
                 Logger.shared.log("Conversion: source=\(result.source.rawValue) len=\(text.count) "
                     + "target=\(result.targetLayoutID ?? "none")")
                 return (result.converted, result.targetLayoutID)
+            }
+            let outcome: ReplacementOutcome
+            if usesEditorMetadata {
+                outcome = host.bindVSCodeEditor()
+                    ? EditorMetadataFlow.run(host: host, onlyLastWord: onlyLastWord, convert: convert)
+                    : .layoutOnly(reason: "editor field not supported or context changed")
+            } else {
+                outcome = ReplacementFlow.run(host: host, onlyLastWord: onlyLastWord, convert: convert)
             }
             host.restoreClipboard()
             DispatchQueue.main.async {
