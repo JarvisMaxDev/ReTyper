@@ -66,6 +66,13 @@ struct KeyStroke: Hashable, Comparable {
 struct KeyLayout {
     let id: String
     let keys: [KeyStroke: Character]
+    let deadKeys: Set<KeyStroke>
+
+    init(id: String, keys: [KeyStroke: Character], deadKeys: Set<KeyStroke> = []) {
+        self.id = id
+        self.keys = keys
+        self.deadKeys = deadKeys
+    }
 
     /// Majority of the letters on unshifted keys.
     var script: Script {
@@ -108,17 +115,25 @@ extension KeyLayout {
         let data = Unmanaged<CFData>.fromOpaque(pointer).takeUnretainedValue() as Data
 
         var keys: [KeyStroke: Character] = [:]
+        var deadKeys: Set<KeyStroke> = []
         data.withUnsafeBytes { raw in
             guard let layout = raw.bindMemory(to: UCKeyboardLayout.self).baseAddress else { return }
             for code in KeyboardKind(keyboardType: keyboardType).keyCodes {
                 for shift in [false, true] {
+                    var state: UInt32 = 0
+                    var length = 0
+                    var output = [UniChar](repeating: 0, count: 4)
+                    let status = UCKeyTranslate(layout, code, UInt16(kUCKeyActionDown),
+                                                shift ? UInt32(shiftKey >> 8) : 0, keyboardType,
+                                                0, &state, output.count, &length, &output)
+                    if status == noErr, state != 0 { deadKeys.insert(KeyStroke(keyCode: code, shift: shift)) }
                     if let character = printedCharacter(layout, code: code, shift: shift, keyboardType: keyboardType) {
                         keys[KeyStroke(keyCode: code, shift: shift)] = character
                     }
                 }
             }
         }
-        return KeyLayout(id: id, keys: keys)
+        return KeyLayout(id: id, keys: keys, deadKeys: deadKeys)
     }
 
     /// The single printable character of a key; dead keys print their own symbol.

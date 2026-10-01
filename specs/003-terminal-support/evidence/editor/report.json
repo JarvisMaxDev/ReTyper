@@ -1,0 +1,1538 @@
+{
+  "failure" : null,
+  "fixture" : "\/private\/var\/folders\/jf\/96nbx4_n3ksb0p99q8_ph5xm0000gn\/T\/opencode\/retyper-003-editor\/repro.txt",
+  "passed" : 90,
+  "pid" : 93650,
+  "results" : [
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:08.748] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.032418250106275082,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.81205529207363725,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:11.338] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.035010125022381544,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.82478916645050049,
+      "scenario" : "partial-backward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:13.549] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.056679458357393742,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.82885145815089345,
+      "scenario" : "partial-word-mode"
+    },
+    {
+      "actual" : "привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "привет",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:14.835] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.10925366636365652,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.88343912502750754,
+      "scenario" : "whole-line"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:16.183] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.098812083248049021,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.87655954156070948,
+      "scenario" : "line-start"
+    },
+    {
+      "actual" : "",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:17.422] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.074126166757196188,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85551037499681115,
+      "scenario" : "empty"
+    },
+    {
+      "actual" : "hello привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "hello привет",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:18.762] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.16081695817410946,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.93686037510633469,
+      "scenario" : "last-word"
+    },
+    {
+      "actual" : ":)",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : ":)",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:20.027] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.077825958374887705,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85606020828709006,
+      "scenario" : "symbols"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 1,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.PolishPro",
+      "layoutAtOutcome" : "com.apple.keylayout.PolishPro",
+      "outcome" : "[2026-10-01 15:12:21.291] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")",
+      "outcomeObservedAfterGestureSeconds" : 0.09256725013256073,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.88127199979498982,
+      "scenario" : "reverse"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 2,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:23.518] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.069601333700120449,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85400349972769618,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 2,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:26.091] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.048269333317875862,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.82884587487205863,
+      "scenario" : "partial-backward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 2,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:28.290] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.029140833299607038,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.81684641633182764,
+      "scenario" : "partial-word-mode"
+    },
+    {
+      "actual" : "привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "привет",
+      "iteration" : 2,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:29.600] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.10293383337557316,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.88116899970918894,
+      "scenario" : "whole-line"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 2,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:30.897] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.066505166701972485,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84241837495937943,
+      "scenario" : "line-start"
+    },
+    {
+      "actual" : "",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "",
+      "iteration" : 2,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:32.147] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.089017041958868504,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.871393708512187,
+      "scenario" : "empty"
+    },
+    {
+      "actual" : "hello привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "hello привет",
+      "iteration" : 2,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:33.479] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.15705095836892724,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.93701324984431267,
+      "scenario" : "last-word"
+    },
+    {
+      "actual" : ":)",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : ":)",
+      "iteration" : 2,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:34.752] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.11213104194030166,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.89831566670909524,
+      "scenario" : "symbols"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 2,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.PolishPro",
+      "layoutAtOutcome" : "com.apple.keylayout.PolishPro",
+      "outcome" : "[2026-10-01 15:12:36.025] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")",
+      "outcomeObservedAfterGestureSeconds" : 0.086638833396136761,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85796095849946141,
+      "scenario" : "reverse"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 3,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:38.185] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.034731583204120398,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.81399800023064017,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 3,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:40.798] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.057637583464384079,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84465666674077511,
+      "scenario" : "partial-backward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 3,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:42.984] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.046930541750043631,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.82035970827564597,
+      "scenario" : "partial-word-mode"
+    },
+    {
+      "actual" : "привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "привет",
+      "iteration" : 3,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:44.222] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.064478875137865543,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84078666660934687,
+      "scenario" : "whole-line"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 3,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:45.539] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.062365791760385036,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84153295820578933,
+      "scenario" : "line-start"
+    },
+    {
+      "actual" : "",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "",
+      "iteration" : 3,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:46.807] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.087541416753083467,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.86251087533310056,
+      "scenario" : "empty"
+    },
+    {
+      "actual" : "hello привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "hello привет",
+      "iteration" : 3,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:48.110] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.15295575000345707,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.92978466674685478,
+      "scenario" : "last-word"
+    },
+    {
+      "actual" : ":)",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : ":)",
+      "iteration" : 3,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:49.388] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.0897515001706779,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.86536854179576039,
+      "scenario" : "symbols"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 3,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.PolishPro",
+      "layoutAtOutcome" : "com.apple.keylayout.PolishPro",
+      "outcome" : "[2026-10-01 15:12:50.652] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")",
+      "outcomeObservedAfterGestureSeconds" : 0.10267658345401287,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.88921704143285751,
+      "scenario" : "reverse"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 4,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:52.829] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.037245624698698521,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.81369687477126718,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 4,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:55.419] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.039403458591550589,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.81464583333581686,
+      "scenario" : "partial-backward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 4,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:57.596] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.037353042047470808,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.81072808336466551,
+      "scenario" : "partial-word-mode"
+    },
+    {
+      "actual" : "привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "привет",
+      "iteration" : 4,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:12:58.859] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.10778170824050903,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.88678220845758915,
+      "scenario" : "whole-line"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 4,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:00.176] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.060790708288550377,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.83977199997752905,
+      "scenario" : "line-start"
+    },
+    {
+      "actual" : "",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "",
+      "iteration" : 4,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:01.432] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.094388333614915609,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.87274779146537185,
+      "scenario" : "empty"
+    },
+    {
+      "actual" : "hello привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "hello привет",
+      "iteration" : 4,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:02.798] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.18382487492635846,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.97110200021415949,
+      "scenario" : "last-word"
+    },
+    {
+      "actual" : ":)",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : ":)",
+      "iteration" : 4,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:04.068] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.090154916513711214,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.86669758334755898,
+      "scenario" : "symbols"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 4,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.PolishPro",
+      "layoutAtOutcome" : "com.apple.keylayout.PolishPro",
+      "outcome" : "[2026-10-01 15:13:05.350] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")",
+      "outcomeObservedAfterGestureSeconds" : 0.1051205419935286,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.88346658367663622,
+      "scenario" : "reverse"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 5,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:07.521] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.06759675033390522,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.8457546248100698,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 5,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:10.117] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.045718958135694265,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.82546141697093844,
+      "scenario" : "partial-backward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 5,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:12.289] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.037443708162754774,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.8291931664571166,
+      "scenario" : "partial-word-mode"
+    },
+    {
+      "actual" : "привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "привет",
+      "iteration" : 5,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:13.567] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.078938249964267015,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.86302466643974185,
+      "scenario" : "whole-line"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 5,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:14.879] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.079647374805063009,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85418170830234885,
+      "scenario" : "line-start"
+    },
+    {
+      "actual" : "",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "",
+      "iteration" : 5,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:16.155] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.085471374914050102,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.86786691658198833,
+      "scenario" : "empty"
+    },
+    {
+      "actual" : "hello привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "hello привет",
+      "iteration" : 5,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:17.467] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.15031641675159335,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.92696516681462526,
+      "scenario" : "last-word"
+    },
+    {
+      "actual" : ":)",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : ":)",
+      "iteration" : 5,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:18.702] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.073200416751205921,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84715016651898623,
+      "scenario" : "symbols"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 5,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.PolishPro",
+      "layoutAtOutcome" : "com.apple.keylayout.PolishPro",
+      "outcome" : "[2026-10-01 15:13:19.942] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")",
+      "outcomeObservedAfterGestureSeconds" : 0.083899375051259995,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.86130066635087132,
+      "scenario" : "reverse"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 6,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:22.133] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.067901166621595621,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85005787527188659,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 6,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:24.764] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.042548125144094229,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.81673883367329836,
+      "scenario" : "partial-backward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 6,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:26.895] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.025601208209991455,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.80369070824235678,
+      "scenario" : "partial-word-mode"
+    },
+    {
+      "actual" : "привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "привет",
+      "iteration" : 6,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:28.145] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.096866458654403687,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.87039850000292063,
+      "scenario" : "whole-line"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 6,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:29.465] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.062199958134442568,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.83640637528151274,
+      "scenario" : "line-start"
+    },
+    {
+      "actual" : "",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "",
+      "iteration" : 6,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:30.687] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.054015999659895897,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.83353887498378754,
+      "scenario" : "empty"
+    },
+    {
+      "actual" : "hello привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "hello привет",
+      "iteration" : 6,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:31.993] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.14435779210180044,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.93352270824834704,
+      "scenario" : "last-word"
+    },
+    {
+      "actual" : ":)",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : ":)",
+      "iteration" : 6,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:33.271] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.090924416668713093,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.88341412506997585,
+      "scenario" : "symbols"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 6,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.PolishPro",
+      "layoutAtOutcome" : "com.apple.keylayout.PolishPro",
+      "outcome" : "[2026-10-01 15:13:34.537] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")",
+      "outcomeObservedAfterGestureSeconds" : 0.080045083537697792,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.8617505831643939,
+      "scenario" : "reverse"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 7,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:36.698] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.035394708160310984,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.80884375004097819,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 7,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:39.276] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.03193787531927228,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.81404370814561844,
+      "scenario" : "partial-backward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 7,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:41.462] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.044006583280861378,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.82698016660287976,
+      "scenario" : "partial-word-mode"
+    },
+    {
+      "actual" : "привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "привет",
+      "iteration" : 7,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:42.709] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.07467504171654582,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.86319524981081486,
+      "scenario" : "whole-line"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 7,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:44.056] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.092781041748821735,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.87348074978217483,
+      "scenario" : "line-start"
+    },
+    {
+      "actual" : "",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "",
+      "iteration" : 7,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:45.298] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.076920333318412304,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85857520857825875,
+      "scenario" : "empty"
+    },
+    {
+      "actual" : "hello привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "hello привет",
+      "iteration" : 7,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:46.641] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.16691166674718261,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.94566387496888638,
+      "scenario" : "last-word"
+    },
+    {
+      "actual" : ":)",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : ":)",
+      "iteration" : 7,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:47.883] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.062201499938964844,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84650758327916265,
+      "scenario" : "symbols"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 7,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.PolishPro",
+      "layoutAtOutcome" : "com.apple.keylayout.PolishPro",
+      "outcome" : "[2026-10-01 15:13:49.127] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")",
+      "outcomeObservedAfterGestureSeconds" : 0.075727916322648525,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.8553057499229908,
+      "scenario" : "reverse"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 8,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:51.265] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.0008790832944214344,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.80191395804286003,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 8,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:53.845] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.013452583458274603,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.79689337499439716,
+      "scenario" : "partial-backward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 8,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:55.992] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.02656737482175231,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.8093604170717299,
+      "scenario" : "partial-word-mode"
+    },
+    {
+      "actual" : "привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "привет",
+      "iteration" : 8,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:57.240] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.070312624797224998,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85017729131504893,
+      "scenario" : "whole-line"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 8,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:58.560] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.078225750010460615,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85911229159682989,
+      "scenario" : "line-start"
+    },
+    {
+      "actual" : "",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "",
+      "iteration" : 8,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:13:59.818] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.060525166336447001,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84417341649532318,
+      "scenario" : "empty"
+    },
+    {
+      "actual" : "hello привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "hello привет",
+      "iteration" : 8,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:01.138] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.15675104176625609,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.93637145822867751,
+      "scenario" : "last-word"
+    },
+    {
+      "actual" : ":)",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : ":)",
+      "iteration" : 8,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:02.425] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.088360958267003298,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.8668997916392982,
+      "scenario" : "symbols"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 8,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.PolishPro",
+      "layoutAtOutcome" : "com.apple.keylayout.PolishPro",
+      "outcome" : "[2026-10-01 15:14:03.694] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")",
+      "outcomeObservedAfterGestureSeconds" : 0.091489750426262617,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.87017720844596624,
+      "scenario" : "reverse"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 9,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:05.887] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.051846916787326336,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.83119629137217999,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 9,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:08.485] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.063228374812752008,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84018383314833045,
+      "scenario" : "partial-backward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 9,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:10.659] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.039297458250075579,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.81669208314269781,
+      "scenario" : "partial-word-mode"
+    },
+    {
+      "actual" : "привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "привет",
+      "iteration" : 9,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:11.935] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.096138000022619963,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.87510566646233201,
+      "scenario" : "whole-line"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 9,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:13.238] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.058469375129789114,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.8499767086468637,
+      "scenario" : "line-start"
+    },
+    {
+      "actual" : "",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "",
+      "iteration" : 9,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:14.514] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.076598958112299442,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85426729172468185,
+      "scenario" : "empty"
+    },
+    {
+      "actual" : "hello привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "hello привет",
+      "iteration" : 9,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:15.854] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.16435187496244907,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 1.0496255001053214,
+      "scenario" : "last-word"
+    },
+    {
+      "actual" : ":)",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : ":)",
+      "iteration" : 9,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:17.250] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.10499416664242744,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.88003662507981062,
+      "scenario" : "symbols"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 9,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.PolishPro",
+      "layoutAtOutcome" : "com.apple.keylayout.PolishPro",
+      "outcome" : "[2026-10-01 15:14:18.504] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")",
+      "outcomeObservedAfterGestureSeconds" : 0.092184249777346849,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.86876604147255421,
+      "scenario" : "reverse"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 10,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:20.648] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.026433875318616629,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.80404224991798401,
+      "scenario" : "partial-forward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 10,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:23.246] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.051090375054627657,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.83134070876985788,
+      "scenario" : "partial-backward"
+    },
+    {
+      "actual" : "prefix привет suffix",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "prefix привет suffix",
+      "iteration" : 10,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:25.406] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.035777416545897722,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.81671008374541998,
+      "scenario" : "partial-word-mode"
+    },
+    {
+      "actual" : "привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "привет",
+      "iteration" : 10,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:26.657] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.075404750183224678,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85409562522545457,
+      "scenario" : "whole-line"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 10,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:27.970] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.070187541656196117,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84496254194527864,
+      "scenario" : "line-start"
+    },
+    {
+      "actual" : "",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "",
+      "iteration" : 10,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:29.220] Replacement outcome: layoutOnly(reason: \"editor: nothing selected\")",
+      "outcomeObservedAfterGestureSeconds" : 0.075037416536360979,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.85028958320617676,
+      "scenario" : "empty"
+    },
+    {
+      "actual" : "hello привет",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "hello привет",
+      "iteration" : 10,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:30.556] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.16483083320781589,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.94104716693982482,
+      "scenario" : "last-word"
+    },
+    {
+      "actual" : ":)",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : ":)",
+      "iteration" : 10,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.RussianWin",
+      "layoutAtOutcome" : "com.apple.keylayout.RussianWin",
+      "outcome" : "[2026-10-01 15:14:31.803] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+      "outcomeObservedAfterGestureSeconds" : 0.068289374932646751,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.84458108339458704,
+      "scenario" : "symbols"
+    },
+    {
+      "actual" : "ghbdtn",
+      "clipboard" : true,
+      "clipboardTrace" : [
+
+      ],
+      "expected" : "ghbdtn",
+      "iteration" : 10,
+      "layout" : true,
+      "layoutAfterDocumentSave" : "com.apple.keylayout.PolishPro",
+      "layoutAtOutcome" : "com.apple.keylayout.PolishPro",
+      "outcome" : "[2026-10-01 15:14:33.056] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")",
+      "outcomeObservedAfterGestureSeconds" : 0.085089458152651787,
+      "pass" : true,
+      "savedDocumentObservedAfterGestureSeconds" : 0.86349924979731441,
+      "scenario" : "reverse"
+    }
+  ]
+}

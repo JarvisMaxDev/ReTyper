@@ -13,8 +13,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     
     private var retryTimer: Timer?
     private var activationObserver: NSObjectProtocol?
+    private var spaceObserver: NSObjectProtocol?
 
-    /// Terminals cannot select a command line with the keyboard, so they only switch the layout.
+    /// Known terminals bypass editor selection. Only end-to-end verified terminals record typing.
     static let terminalBundleIDs: Set<String> = [
         "com.apple.Terminal", "com.googlecode.iterm2", "dev.warp.Warp-Stable", "com.mitchellh.ghostty",
         "net.kovidgoyal.kitty", "org.alacritty", "com.github.wez.wezterm", "co.zeit.hyper",
@@ -45,7 +46,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         keyboardMonitor.start()
         activationObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
-        ) { [weak self] _ in self?.keyboardMonitor.invalidateContext() }
+        ) { [weak self] _ in
+            self?.keyboardMonitor.invalidateContext()
+            self?.keyboardMonitor.setTerminalTarget(NSWorkspace.shared.frontmostApplication)
+        }
+        spaceObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            self?.keyboardMonitor.invalidateContext()
+            self?.keyboardMonitor.terminalRecorder.reset()
+        }
+        keyboardMonitor.setTerminalTarget(NSWorkspace.shared.frontmostApplication)
         
         // If monitor didn't start, prompt for Input Monitoring and retry
         if !keyboardMonitor.isRunning {
@@ -78,6 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         keyboardMonitor.stop()
         layoutManager.stopObserving()
         if let activationObserver { NSWorkspace.shared.notificationCenter.removeObserver(activationObserver) }
+        if let spaceObserver { NSWorkspace.shared.notificationCenter.removeObserver(spaceObserver) }
     }
     
     // MARK: - Hotkey Handler
@@ -85,6 +97,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func handleHotkey() {
         // A second hotkey during a replacement is ignored rather than queued.
         guard !isReplacing else { return }
+        if let app = NSWorkspace.shared.frontmostApplication,
+           TerminalReplacement.supportedBundleIDs.contains(app.bundleIdentifier ?? "") {
+            handleTerminalHotkey(app: app)
+            return
+        }
         guard let app = NSWorkspace.shared.frontmostApplication,
               app.processIdentifier != getpid(),
               !Self.terminalBundleIDs.contains(app.bundleIdentifier ?? "") else {
@@ -124,6 +141,97 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.async {
                 self?.isReplacing = false
                 self?.finish(outcome)
+            }
+        }
+    }
+
+    private func handleTerminalHotkey(app: NSRunningApplication) {
+        // Acquire inside the active tap's hotkey callback, before a following Return can pass.
+        guard keyboardMonitor.beginTerminalInputHold() else { return }
+        isReplacing = true
+        let gate = keyboardMonitor.terminalInputGate
+        let ticket = gate.generation
+        gate.onDrained = { [weak self] in
+            if let count = self?.keyboardMonitor.terminalInputGate.deferredEventCount, count > 0 {
+                Logger.shared.log("Terminal input replayed: events=\(count)")
+            }
+            self?.keyboardMonitor.finishTerminalReplay()
+            self?.isReplacing = false
+        }
+        // Fail open if focus inspection stalls. A late result cannot begin deleting afterwards.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard gate.generation == ticket, gate.holding, !gate.replacementStarted else { return }
+            self?.keyboardMonitor.terminalRecorder.reset(reason: "preflight deadline")
+            if NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier {
+                self?.finish(.layoutOnly(reason: "terminal: deadline"))
+            }
+            gate.release()
+        }
+        DispatchQueue.main.async { [weak self] in
+            guard gate.generation == ticket, gate.holding else { return }
+            self?.prepareTerminalReplacement(app: app, ticket: ticket)
+        }
+    }
+
+    private func prepareTerminalReplacement(app: NSRunningApplication, ticket: Int) {
+        let recorder = keyboardMonitor.terminalRecorder
+        let gate = keyboardMonitor.terminalInputGate
+        guard !IsSecureEventInputEnabled() else {
+            recorder.reset(); finish(.layoutOnly(reason: "secure input")); gate.release(); return
+        }
+        let fragment = recorder.fragment
+        guard let context = recorder.context, context.pid == app.processIdentifier else {
+            finish(.layoutOnly(reason: "terminal: no bound fragment")); gate.release(); return
+        }
+        let keyboardType = UInt32(LMGetKbdType())
+        let layouts = layoutManager.relevantLayoutIDs().compactMap { KeyLayout.system(id: $0, keyboardType: keyboardType) }
+        let currentLayout = layoutManager.currentLayoutID()
+        guard let edit = TerminalReplacement.edit(fragment: fragment, onlyLastWord: settings.switchOnlyLastWord, convert: { text in
+            let result = TextConverter.convert(text, layouts: layouts, currentLayoutID: currentLayout)
+            return (result.converted, result.targetLayoutID)
+        }) else { finish(.layoutOnly(reason: "terminal: nothing to convert")); gate.release(); return }
+        let revision = keyboardMonitor.contextRevision
+        replacementQueue.async { [weak self] in
+            let valid = context.isCurrent()
+            let events = valid ? KeyboardMonitor.terminalEvents(edit) : nil
+            DispatchQueue.main.async {
+                guard let self else { return }
+                guard gate.generation == ticket, gate.holding else { return }
+                guard let events, self.keyboardMonitor.contextRevision == revision,
+                      recorder.fragment.generation == fragment.generation,
+                      NSWorkspace.shared.frontmostApplication?.processIdentifier == context.pid,
+                      !IsSecureEventInputEnabled(),
+                      !CGEventSource.buttonState(.combinedSessionState, button: .left),
+                      !CGEventSource.buttonState(.combinedSessionState, button: .right) else {
+                    recorder.reset()
+                    if NSWorkspace.shared.frontmostApplication?.processIdentifier == context.pid {
+                        self.finish(.layoutOnly(reason: "terminal: context changed"))
+                    }
+                    gate.release()
+                    return
+                }
+                // This bounded, prebuilt posting batch runs outside the tap callback. The tap
+                // cannot deliver a user Return/Tab/click in its middle; it defers those events.
+                gate.markReplacementStarted()
+                for event in events { event.postToPid(context.pid) }
+                recorder.apply(edit, ifGeneration: fragment.generation)
+                self.finish(.replaced(targetLayoutID: edit.targetLayoutID))
+                Logger.shared.log("Terminal replacement posted: len=\(edit.deleteCount)")
+                self.releaseTerminalInput(afterSelecting: edit.targetLayoutID,
+                                          deadline: ProcessInfo.processInfo.systemUptime + 0.2,
+                                          generation: self.keyboardMonitor.terminalInputGate.generation)
+            }
+        }
+    }
+
+    private func releaseTerminalInput(afterSelecting layout: String, deadline: TimeInterval, generation: Int) {
+        guard keyboardMonitor.terminalInputGate.holding,
+              keyboardMonitor.terminalInputGate.generation == generation else { return }
+        if layoutManager.currentLayoutID() == layout || ProcessInfo.processInfo.systemUptime >= deadline {
+            keyboardMonitor.terminalInputGate.release()
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
+                self?.releaseTerminalInput(afterSelecting: layout, deadline: deadline, generation: generation)
             }
         }
     }

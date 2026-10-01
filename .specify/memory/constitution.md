@@ -1,6 +1,15 @@
 <!--
 Sync Impact Report
-- Current amendment: 7.0.0 -> 8.0.0, 2026-10-01 (principle III, narrowly scoped VS Code metadata probe).
+- Current amendment: 9.0.0 -> 10.0.0, 2026-10-01 (one-release manual verification gate for 003).
+- Approval: owner explicitly authorized commit/push and deferred his manual checks until the
+  published build is available on his other computers. Automated gates are not waived.
+- Scope/expiry: first terminal-support release only; specs/003-terminal-support/release-gate.md.
+- Previous amendment: 8.0.0 -> 9.0.0, 2026-10-01 (principle III, terminal input gate).
+- Approval: the owner explicitly chose «Да, делай надёжно» for temporarily holding and replaying
+  user input during terminal replacement, so Return cannot submit a partially edited command.
+- Terminal input is gated from hotkey recognition through the bounded transaction; other apps
+  retain passive monitoring. No new permissions or persistence. Release gates remain unchanged.
+- Previous amendment: 7.0.0 -> 8.0.0, 2026-10-01 (narrowly scoped VS Code metadata probe).
 - Approval: after the proposed probe-copy exception and 80/80 controlled text checks, the owner
   directed the agent to experiment, change the application and achieve a usable result.
 - Only the validated VS Code editor context may probe-copy despite an unreliable AX zero range.
@@ -32,8 +41,7 @@ Sync Impact Report
   The 6.0.0 pending sync of README "Supported Layouts" was completed with feature 002 (v0.10.0)
 - Migration: none for preferences; in listed terminals the hotkey now replaces typed text
 - Templates: plan/spec/tasks templates read the constitution at runtime; no template changes needed
-- Pending sync (not done by this amendment): README "Known limitations" still says terminals only
-  switch the layout; update with feature 003 implementation
+- README "Known limitations" synchronized with feature 003 on 2026-10-01.
 -->
 # ReTyper Constitution
 
@@ -121,9 +129,13 @@ copy/paste запрещён. Протокол MUST быть ограничен �
 удалением ровно этого фрагмента (или его последнего слова) Backspace — по одному нажатию на
 запомненный символ — и вводом преобразованного текста; удаление по предполагаемому числу символов
 остаётся запрещённым. Перед заменой MUST проверяться, что приложение и фрагмент не изменились.
-Начатая серия удаления и ввода MUST доводиться до конца. Нажатие пользователя внутри серии может
-исказить результат; это документированное ограничение, оно MUST обнаруживаться и записываться в
-журнал без текста.
+Начатая серия удаления и ввода MUST доводиться до конца. В терминальном пути нажатия пользователя
+MUST кратко задерживаться с момента распознавания хоткея и воспроизводиться по порядку после
+замены либо её отмены; Enter MUST NOT попасть внутрь серии удаления и ввода. Ожидание проверки
+контекста MUST иметь конечный срок, поздний результат после отмены MUST NOT начинать удаление.
+Очередь существует только в памяти и не журналируется; допустимы её размер и переходы состояния.
+Если символ воспроизведённого события после смены раскладки нельзя знать точно, запоминание
+фрагмента MUST приостанавливаться до сброса. Остальные приложения сохраняют пассивный мониторинг.
 
 Буфер обмена MAY временно использоваться для копирования и вставки. Перед первым копированием
 MUST сохраняться всё его содержимое, а после операции оно MUST возвращаться, если за это время
@@ -376,6 +388,34 @@ MAJOR-поправка 6.0.0, поскольку принцип переопре
 списка хоткей начинает заменять набранный текст там, где раньше только переключал раскладку. Это
 MAJOR-поправка 7.0.0, поскольку принцип III переопределён несовместимо.
 
+## Поправка 2026-10-01: ввод во время терминальной замены
+
+Владелец ответил «Да, делай надёжно» на предложение кратко задерживать и затем воспроизводить
+ввод пользователя во время терминальной замены. Принцип III теперь требует удерживать Enter
+вместе с остальными событиями, вместо прежнего допуска смешивания событий с возможной порчей
+строки. Живой сценарий с Enter через 10 мс подтвердил недостаточность позднего включения перехвата:
+удержание должно начинаться в callback самого хоткея. В других приложениях tap остаётся listen-only.
+Технический контракт: [реализация 003](../../specs/003-terminal-support/implementation.md).
+
+Это MAJOR-поправка 9.0.0. Приватность, исключение редактора из 8.0.0, минимальная версия системы,
+настройки и предрелизные проверки сохраняются. Одобрение разработки не разрешает публикацию.
+
+## Одноразовый гейт терминального выпуска, 2026-10-01
+
+Владелец явно разрешил коммит и пуш первого выпуска 003 и сообщил, что сам проверит готовую
+сборку на других компьютерах. Его финальная ручная проверка и нативный скриншот Терминала
+MAY быть перенесены после публикации. Точный объём и оставшиеся ограничения записаны в
+[release-gate.md](../../specs/003-terminal-support/release-gate.md).
+
+Полные unit-тесты, обе release-архитектуры, упаковка/подпись, успешные терминальные и редакторные
+автоматические проверки, свежий визуальный результат редактора, отсутствие пользовательского
+текста в журнале и проверка опубликованных артефактов остаются обязательными. Непроверенные
+ручные сценарии MUST оставаться помеченными как отложенные, не PASS. Новый дефект сохранности
+текста или приватности MUST блокировать публикацию.
+
+Это MAJOR-поправка 10.0.0 к полноте приёмочного гейта. Она действует только для первого выпуска
+поддержки терминала после 0.10.1 и истекает после него; защитный контракт 9.0.0 не меняется.
+
 ## Governance
 
 Эта конституция имеет приоритет над README, локальными привычками и отдельными планами. Все
@@ -415,4 +455,4 @@ MAJOR-поправка 7.0.0, поскольку принцип III переоп
 неверные метаданные и свежая проверка кандидата обязательны. Миграция настроек не требуется.
 Версия 8.0.0 — MAJOR-переопределение допустимого источника подтверждения выделения.
 
-**Version**: 8.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-10-01
+**Version**: 10.0.0 | **Ratified**: 2026-08-12 | **Last Amended**: 2026-10-01

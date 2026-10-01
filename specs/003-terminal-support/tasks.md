@@ -5,6 +5,14 @@ description: "Task list for 003-terminal-support"
 
 # Tasks: Преобразование текста в терминалах
 
+> **Редакция исполнения 2026-10-01:** база 0.10.1, конституция 9.0.0.
+> Технические детали ниже применяются с поправками [implementation.md](./implementation.md):
+> `isSuspended`, отдельные Recorder/Context/Gate, привязка по epoch, удержание с хоткея,
+> отдельный TerminalDriver вместо расширения редакторного Driver. T007/T009/T010 находятся
+> в `TerminalReplacementTests.swift`. Результаты спайков и согласования S4 сохранены исторически.
+> Выпуск: конституция 10.0.0 и [одноразовый гейт](./release-gate.md); ручные T028/T032
+> перенесены владельцем на готовую сборку и не помечаются выполненными.
+
 **Input**: Design documents from `specs/003-terminal-support/`
 
 **Prerequisites**: [plan.md](./plan.md), [spec.md](./spec.md), [research.md](./research.md),
@@ -94,23 +102,23 @@ line='<preset>'; vared -p '> ' -c line; print -rn -- "$line" > '<out>/line-<n>.t
 
 **⚠️ CRITICAL**: ни одна история не начинается до завершения фазы; фаза начинается только после T006 = «продолжать»
 
-- [ ] T007 [P] Add failing tests to `Tests/ReTyperTests/KeyLayoutTests.swift` (keyboard type `41`, system layouts; a missing reference layout is `XCTFail`, never `XCTSkip`):
+- [X] T007 [P] Add failing tests to `Tests/ReTyperTests/KeyLayoutTests.swift` (keyboard type `41`, system layouts; a missing reference layout is `XCTFail`, never `XCTSkip`):
   - `deadKeys` is empty for `com.apple.keylayout.PolishPro`, `.RussianWin`, `.Russian`, `.US`, `.ABC`, `.Ukrainian-PC`.
   - `com.apple.keylayout.German` has exactly `{KeyStroke(10,false), KeyStroke(24,false), KeyStroke(24,true)}`; `com.apple.keylayout.French` has exactly `{(33,false), (33,true), (42,false)}`. The values were measured on type 62; if type 41 differs, record the measured set in [research.md R3](./research.md#r3-мёртвые-клавиши) and use it.
   - Existing synthetic `KeyLayout(id:keys:)` calls keep compiling and have empty `deadKeys`.
   - `keys` and `mapping(to:)` results are unchanged (existing tests stay green)
-- [ ] T008 Add `let deadKeys: Set<KeyStroke>` to `KeyLayout` in `Sources/ReTyper/KeyLayout.swift`:
+- [X] T008 Add `let deadKeys: Set<KeyStroke>` to `KeyLayout` in `Sources/ReTyper/KeyLayout.swift`:
   - Explicit init `init(id: String, keys: [KeyStroke: Character], deadKeys: Set<KeyStroke> = [])` so existing callers compile.
   - In `KeyLayout.system`, for every key code of `KeyboardKind(keyboardType:).keyCodes` and Shift off/on, call `UCKeyTranslate` a second time with options `0` (dead keys enabled) and `deadKeyState = 0`; a non-zero `deadKeyState` afterwards → insert the stroke into `deadKeys`. The existing `printedCharacter` call with `kUCKeyTranslateNoDeadKeysMask` stays as is, so conversion (feature 002) does not change.
   - Make T007 pass
-- [ ] T009 [P] Write failing tests in new `Tests/ReTyperTests/TypedFragmentTests.swift` per [data-model.md, TypedFragment](./data-model.md#typedfragment):
+- [X] T009 [P] Write failing tests in new `Tests/ReTyperTests/TypedFragmentTests.swift` per [data-model.md, TypedFragment](./data-model.md#typedfragment):
   - `append` adds characters in order; `deleteBackward` removes the last one; `deleteBackward` on an empty fragment keeps it empty.
   - `generation` increases on every `append`, `deleteBackward` (including on empty), `reset` and `replaceTail`.
   - `maximumLength == 256`: 256 appends fit; the 257th is not added, `text` becomes empty and `isOverflowed` is set; further `append`/`deleteBackward` keep `text` empty and only bump `generation`; `reset` clears `isOverflowed`.
   - `window` is nil initially and after `reset()`; setting it and then calling `reset()` clears it (use `AXUIElementCreateApplication(getpid())` as a dummy element).
   - `replaceTail(count: 6, with: "привет")` on `ls ghbdtn` gives `ls привет`; `count` greater than `text.count` is a precondition failure, so test only valid counts.
   - `text.count` equals the number of appended characters for Cyrillic and Latin input (one code point each)
-- [ ] T010 [P] Write failing tests in new `Tests/ReTyperTests/TerminalKeyTests.swift` for `TerminalKey.classify(keyCode:flags:layout:)` per [contract](./contracts/terminal-hotkey.md#terminalkeyclassify), using system layouts `PolishPro`, `RussianWin` and `German` on type `41`:
+- [X] T010 [P] Write failing tests in new `Tests/ReTyperTests/TerminalKeyTests.swift` for `TerminalKey.classify(keyCode:flags:layout:)` per [contract](./contracts/terminal-hotkey.md#terminalkeyclassify), using system layouts `PolishPro`, `RussianWin` and `German` on type `41`:
   - PolishPro: key 5 (`g`) → `.character("g")`; key 5 + Shift → `.character("G")`; key 22 + Shift → `.character("^")`.
   - RussianWin: key 5 → `.character("п")`; key 22 + Shift → `.character(":")`.
   - Space 49 → `.character(" ")`, with Shift too; Backspace 51 → `.backspace`.
@@ -118,11 +126,11 @@ line='<preset>'; vared -p '> ' -c line; print -rn -- "$line" > '<out>/line-<n>.t
   - `.reset` for key 5 and for Backspace with any of `.maskCommand`, `.maskControl`, `.maskAlternate`, `.maskAlphaShift`.
   - `.maskNonCoalesced`, `.maskNumericPad`, `.maskSecondaryFn` alone do not change the result for key 5.
   - German key 24 (dead) → `.reset`; `layout: nil` → `.reset`
-- [ ] T011 Create `Sources/ReTyper/TerminalReplacement.swift` with the pure types from [data-model.md](./data-model.md):
+- [X] T011 Create `Sources/ReTyper/TerminalReplacement.swift` with the pure types from [data-model.md](./data-model.md):
   - `struct TypedFragment` (`text`, `isOverflowed`, `generation`, `window: AXUIElement?`, `static let maximumLength = 256`, `append`, `deleteBackward`, `reset`, `replaceTail(count:with:)`). Overflow clears `text` (constitution 7.0.0, principles I and III).
   - `enum TerminalKey: Equatable { case character(Character), backspace, reset }` with `static func classify(keyCode: UInt16, flags: CGEventFlags, layout: KeyLayout?) -> TerminalKey` using the constants above; the main-block check uses `layout.keys[KeyStroke(keyCode:shift:)]` so the keyboard kind is already applied.
   - No TIS calls, no logging. Make T009 and T010 pass
-- [ ] T012 Record typing in `Sources/ReTyper/KeyboardMonitor.swift`:
+- [X] T012 Record typing in `Sources/ReTyper/KeyboardMonitor.swift`:
   - New state: `var recordsTyping = false` (set by AppDelegate), `private(set) var fragment = TypedFragment()`, `func resetFragment()`, and a layout cache `[String: KeyLayout?]` keyed by `"\(id)|\(keyboardType)"` (a nil result is cached too, so a layout without key data costs one lookup).
   - Add `leftMouseDown`, `rightMouseDown`, `otherMouseDown` to the tap mask. In `handle`, a mouse-down calls `resetFragment()` and nothing else: it must **not** call `detector.disarm()` (principle III: mouse input does not cancel the hotkey).
   - On a non-synthetic `keyDown`, after the existing counter and `detector.disarm()`: if `recordsTyping`, read `LayoutManager.shared.currentLayoutID()` and `UInt32(LMGetKbdType())`, get the cached `KeyLayout`, `TerminalKey.classify`, and apply it to `fragment`. When not recording, do nothing with the fragment.
@@ -130,11 +138,11 @@ line='<preset>'; vared -p '> ' -c line; print -rn -- "$line" > '<out>/line-<n>.t
   - On `flagsChanged` with key code 63 or 179 (Fn / Globe): `resetFragment()` ([R2](./research.md#r2-какие-нажатия-пополняют-фрагмент-какие-сбрасывают), dictation).
   - On `tapDisabledByTimeout`/`tapDisabledByUserInput`: `resetFragment()` too (key presses may have been missed).
   - Setting `recordsTyping` to false resets the fragment. Never log characters or key codes
-- [ ] T013 Wire recording in `Sources/ReTyper/AppDelegate.swift`:
+- [X] T013 Wire recording in `Sources/ReTyper/AppDelegate.swift`:
   - `static let typingTerminalBundleIDs: Set<String> = ["com.apple.Terminal"]` next to `terminalBundleIDs`, with a comment that a terminal joins it only after the quickstart scenarios pass in it (constitution 7.0.0, principle III).
   - Observe `NSWorkspace.didActivateApplicationNotification` on `NSWorkspace.shared.notificationCenter`: on every activation `keyboardMonitor.resetFragment()` and `keyboardMonitor.recordsTyping = typingTerminalBundleIDs.contains(bundleID)`. Set the initial value from `NSWorkspace.shared.frontmostApplication` after `keyboardMonitor.start()`. Also observe `NSWorkspace.activeSpaceDidChangeNotification` → `keyboardMonitor.resetFragment()`. Remove both observers in `applicationWillTerminate`, and reset the fragment there.
   - `handleHotkey()` behaviour is unchanged in this task
-- [ ] T014 Run `swift test`; all tests pass. Build and launch with `./build.sh` (or `swift build`), type in Terminal and check in `~/Library/Caches/com.retyper.app/retyper.log` that nothing typed appears. Confirm the log shows `KeyboardMonitor started` with mouse events added to the tap mask and that macOS showed no new permission prompt (FR-016); if the tap fails to start, stop. Record in `verification.md`
+- [X] T014 Run `swift test`; all tests pass. Build and launch with `./build.sh` (or `swift build`), type in Terminal and check in `~/Library/Caches/com.retyper.app/retyper.log` that nothing typed appears. Confirm the log shows `KeyboardMonitor started` with mouse events added to the tap mask and that macOS showed no new permission prompt (FR-016); if the tap fails to start, stop. Record in `verification.md`
 
 **Checkpoint**: фрагмент набирается и сбрасывается; видимого поведения пока нет
 
@@ -150,7 +158,7 @@ line='<preset>'; vared -p '> ' -c line; print -rn -- "$line" > '<out>/line-<n>.t
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T015 [P] [US1] Write failing tests in new `Tests/ReTyperTests/TerminalReplacementTests.swift` for `TerminalReplacement.edit(fragment:onlyLastWord:convert:)` per [contract](./contracts/terminal-hotkey.md#terminalreplacementedit). Use the real converter `{ let r = TextConverter.convert($0, layouts: [polishPro, russianWin], currentLayoutID: <id>); return (r.converted, r.targetLayoutID) }` with system layouts on type `41`:
+- [X] T015 [P] [US1] Write failing tests in new `Tests/ReTyperTests/TerminalReplacementTests.swift` for `TerminalReplacement.edit(fragment:onlyLastWord:convert:)` per [contract](./contracts/terminal-hotkey.md#terminalreplacementedit). Use the real converter `{ let r = TextConverter.convert($0, layouts: [polishPro, russianWin], currentLayoutID: <id>); return (r.converted, r.targetLayoutID) }` with system layouts on type `41`:
   - `ghbdtn`, whole line → `TerminalEdit(deleteCount: 6, insert: "привет", targetLayoutID: RussianWin)`.
   - `сгкд -Ш` → `insert "curl -I"`, `deleteCount 7`, target PolishPro.
   - `ghbdtn vbh`, whole line → `привет мир`, `deleteCount 10`.
@@ -158,7 +166,7 @@ line='<preset>'; vared -p '> ' -c line; print -rn -- "$line" > '<out>/line-<n>.t
   - Last word keeps trailing spaces: `ls ghbdtn ` → `deleteCount 7`, `insert "привет "`.
   - `^)` with current PolishPro → `:)`; applying `replaceTail` and calling `edit` again with current RussianWin → `^)` (FR-011 reversibility); same for `ghbdtn` ↔ `привет`.
   - nil for: empty fragment; overflowed fragment; `onlyLastWord` with only spaces; letters tie (`ab аб`); converter returning the same text (`12345` with current `com.apple.keylayout.ABC`); a stub converter whose result length differs from the source
-- [ ] T016 [P] [US1] Add a `--terminal` mode to `Tools/ReTyperStand/Driver.swift` and pass it through in `Tools/ReTyperStand/run.sh` ([R11](./research.md#r11-автоматическая-сквозная-проверка), [quickstart §4](./quickstart.md#4-автоматический-стенд)):
+- [X] T016 [P] [US1] Add a `--terminal` mode to `Tools/ReTyperStand/Driver.swift` and pass it through in `Tools/ReTyperStand/run.sh` ([R11](./research.md#r11-автоматическая-сквозная-проверка), [quickstart §4](./quickstart.md#4-автоматический-стенд)):
   - `struct TerminalScenario { number, title, layout, preset, keys (text to type), extraKeys (e.g. Backspace, Left, ⌃A before the hotkey), hotkeyPresses (0, 1 or 2), lastWord, expectedLine, expectedLayout, expectedOutcome }`.
   - Per scenario: select the layout, write the `.command` from «Общие константы», `open -a Terminal`, wait for Terminal frontmost and 1 s for the prompt. Type `keys` by key code: build the reverse map «character → (keyCode, shift)» from `UCKeyTranslate` of the current layout; post without ReTyper's marker so ReTyper sees user input. Post only while Terminal is frontmost; otherwise abort the run.
   - Press double ⌥ with the existing `postOptionTap()`, wait up to 2 s for a `Replacement outcome:` line in the log, press Return, wait up to 3 s for `line-<n>.txt`, compare text, layout and the log outcome. Use `richClipboardContents()` (RTF + text) as the clipboard sentinel and check that it is unchanged (SC-003); check that the log contains none of the typed strings.
@@ -168,14 +176,14 @@ line='<preset>'; vared -p '> ' -c line; print -rn -- "$line" > '<out>/line-<n>.t
 
 ### Implementation for User Story 1
 
-- [ ] T017 [US1] Add `struct TerminalEdit` and `enum TerminalReplacement { static func edit(...) -> TerminalEdit? }` to `Sources/ReTyper/TerminalReplacement.swift` per the contract: source is `fragment.text` or `ReplacementFlow.lastWord(in:)`; nil for empty/overflowed fragment, empty source, nil target, unchanged result or different length. Make T015 pass
-- [ ] T018 [P] [US1] Add `static func type(_ character: Character)` to `Sources/ReTyper/KeyboardMonitor.swift` next to `press`: key-down/key-up pair with virtual key 0, empty flags, the UTF-16 of the character set via `keyboardSetUnicodeString`, `syntheticEventMarker`, 1 ms hold, posted to `.cghidEventTap` from the same `CGEventSource(stateID: .hidSystemState)` as `press`
-- [ ] T019 [US1] Add the terminal branch to `handleHotkey()` in `Sources/ReTyper/AppDelegate.swift`:
+- [X] T017 [US1] Add `struct TerminalEdit` and `enum TerminalReplacement { static func edit(...) -> TerminalEdit? }` to `Sources/ReTyper/TerminalReplacement.swift` per the contract: source is `fragment.text` or `ReplacementFlow.lastWord(in:)`; nil for empty/overflowed fragment, empty source, nil target, unchanged result or different length. Make T015 pass
+- [X] T018 [P] [US1] Реализовано как `KeyboardMonitor.terminalEvents`: весь массив создаётся заранее, затем отправляется прежнему PID. См. актуальный контракт `implementation.md` вместо прежнего `type`/задержки 1 мс.
+- [X] T019 [US1] Add the terminal branch to `handleHotkey()` in `Sources/ReTyper/AppDelegate.swift`:
   - Before the existing terminal check: if the frontmost bundle ID is in `typingTerminalBundleIDs`, call a new `handleTerminalHotkey(app:)`. `terminalBundleIDs` stays the layout-only list for the other terminals; Terminal.app no longer reaches it.
   - In `handleTerminalHotkey`, on the main thread: build `layouts` and `currentLayoutID` exactly as the existing code does; take `fragment` and its `generation` from `keyboardMonitor`; call `TerminalReplacement.edit` with the same `TextConverter` closure and log line `Conversion: source=… len=… target=…`. Nil → `finish(.layoutOnly(reason: "terminal: nothing to convert"))`, fragment unchanged.
   - Otherwise set `isReplacing`, and on `replacementQueue`: `deleteCount` × `KeyboardMonitor.press(keyCode: 51, holdMicroseconds: 1_000)`, then `KeyboardMonitor.type` for each character of `insert`. Back on main: `keyboardMonitor.fragment.replaceTail(count:with:)` (add a mutating method on `KeyboardMonitor` for this), `isReplacing = false`, `finish(.replaced(targetLayoutID:))`.
   - Log `Terminal replacement: len=<deleteCount> target=<id>`; no text. The clipboard is not touched
-- [ ] T020 [US1] Run `swift test`, rebuild and relaunch ReTyper, run `Tools/ReTyperStand/run.sh --terminal` (scenarios T1–T7) and record per-scenario results in `specs/003-terminal-support/verification.md`
+- [X] T020 [US1] Run `swift test`, rebuild and relaunch ReTyper, run `Tools/ReTyperStand/run.sh --terminal` (scenarios T1–T7) and record per-scenario results in `specs/003-terminal-support/verification.md`
 
 **Checkpoint**: основная замена работает; защитные проверки US2 ещё не добавлены — **не выпускать**
 
@@ -191,17 +199,17 @@ line='<preset>'; vared -p '> ' -c line; print -rn -- "$line" > '<out>/line-<n>.t
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T021 [P] [US2] Extend `Tests/ReTyperTests/TerminalKeyTests.swift` and `Tests/ReTyperTests/TypedFragmentTests.swift` with the User Story 2 sequences, applying `classify` results to a `TypedFragment` the same way `KeyboardMonitor` does (a small test helper, not production code): `ghbdtn` + Left → empty; `gi` + Tab → empty; Up → empty; `ghbdtn` + ⌘V → empty; `ghbdtn` + ⌃A → empty; 257 × `a` → overflowed with empty `text`, then `ghbdtn` is not recorded, and `TerminalReplacement.edit` returns nil
-- [ ] T022 [P] [US2] Add User Story 2 scenarios to the `--terminal` mode in `Tools/ReTyperStand/Driver.swift`: T8 `ghbdtn` + Left → line `ghbdtn`, layout switched, outcome `layoutOnly`; T9 `ghbdtn` + ⌃A → `ghbdtn`, layout switched; T10 preset `ls` with nothing typed → `ls`, layout switched; T11 260 × `a` → 260 × `a`, layout switched; T12 (informational) `ghbdtn`, hotkey, then key `x` posted 10 ms later → record the line and whether the log has `interleaved input`; it passes if the line is `привет` followed by the character of key `x` in the new layout (`ч`) **or** the log has `interleaved input` for that run; T13 100 × `a` on PL, hotkey → 100 × `ф`, RU — the driver measures the time from its second ⌥ release to the `Replacement outcome:` log line and presses Return only after that line (SC-004). Tab, mouse clicks, ⌘V and window switching by gesture are covered by the owner's manual scenarios (their result in `vared` is not deterministic)
+- [X] T021 [P] [US2] Сбросы классификатора, очистка/приостановка фрагмента, переполнение и запрет замены покрыты `TerminalReplacementTests.swift`. Последовательности стрелки/Control/Tab/Paste/Mouse/AppReturn/Secure проверены через реальную интеграцию в терминальном стенде вместо дублирования production-switch в тестовом helper.
+- [X] T022 [P] [US2] Сценарии реализованы в `TerminalDriver.swift`: T8–T11, T13, Typing0 (заменяет T12), Enter0/10/30/80, TMax, Tab, Paste, Mouse, AppReturn и Secure. См. актуальные критерии в `implementation.md`.
 
 ### Implementation for User Story 2
 
-- [ ] T023 [US2] Secure input in `Sources/ReTyper/AppDelegate.swift` `handleTerminalHotkey`: first call `IsSecureEventInputEnabled()` (import Carbon); if true → `keyboardMonitor.resetFragment()`, `finish(.layoutOnly(reason: "secure input"))`, nothing typed (FR-007, [R7](./research.md#r7-защищённый-ввод-и-пароли-fr-007))
-- [ ] T024 [US2] Context check and interruption in `handleTerminalHotkey` ([R6](./research.md#r6-прерывание-во-время-замены-fr-009), FR-009):
+- [X] T023 [US2] Secure input in `Sources/ReTyper/AppDelegate.swift` `handleTerminalHotkey`: first call `IsSecureEventInputEnabled()` (import Carbon); if true → `keyboardMonitor.resetFragment()`, `finish(.layoutOnly(reason: "secure input"))`, nothing typed (FR-007, [R7](./research.md#r7-защищённый-ввод-и-пароли-fr-007))
+- [X] T024 [US2] Context check and interruption in `handleTerminalHotkey` ([R6](./research.md#r6-прерывание-во-время-замены-fr-009), FR-009), с одобренным удержанием ввода вместо старого допуска смешивания:
   - On `replacementQueue`, before the first Backspace, check on main that the frontmost PID equals the hotkey app's PID, `keyboardMonitor.fragment.generation` equals the captured value, and the app's current `AXFocusedWindow` is `CFEqual` to `fragment.window`. A mismatch → `finish(.layoutOnly(reason: "context changed"))`; nil window on either side → `finish(.layoutOnly(reason: "window unknown or changed"))`; nothing typed in both cases.
   - Capture `keyboardMonitor.userKeyDownCount` before the series; once started, the series always completes.
   - After the series, on main: if `userKeyDownCount` changed → `resetFragment()`, log `Terminal replacement: interleaved input` (no text), still `finish(.replaced(...))`; otherwise `replaceTail` as in T019
-- [ ] T025 [US2] Run `swift test` and `Tools/ReTyperStand/run.sh --terminal` (T1–T13); record results in `specs/003-terminal-support/verification.md`
+- [X] T025 [US2] Run `swift test` and `Tools/ReTyperStand/run.sh --terminal` (T1–T13); record results in `specs/003-terminal-support/verification.md`
 
 **Checkpoint**: US1 + US2 — выпускаемый объём для Терминала
 
@@ -215,11 +223,11 @@ line='<preset>'; vared -p '> ' -c line; print -rn -- "$line" > '<out>/line-<n>.t
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T026 [P] [US3] Add a test in `Tests/ReTyperTests/TerminalKeyTests.swift` (or a new `Tests/ReTyperTests/TerminalListTests.swift`) asserting `AppDelegate.typingTerminalBundleIDs == ["com.apple.Terminal"]`, that it is a subset of `AppDelegate.terminalBundleIDs`, and that it contains none of `com.microsoft.VSCode`, `com.jetbrains.WebStorm`, `com.jetbrains.intellij`. If `AppDelegate` is not reachable from the test target, move both sets to a small `enum TerminalApps` in `Sources/ReTyper/TerminalReplacement.swift` and reference it from `AppDelegate`
+- [X] T026 [P] [US3] Проверка whitelist: `testOnlyVerifiedStandaloneTerminalIsEnabled` в `TerminalReplacementTests.swift`; источник списка — `TerminalReplacement.supportedBundleIDs`.
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] Run the ordinary stand `Tools/ReTyperStand/run.sh` (scenarios 1–11) on the new build; results must match v0.10.0: no new failures (SC-005, FR-015). Record in `specs/003-terminal-support/verification.md`
+- [X] T027 [US3] Run the ordinary stand `Tools/ReTyperStand/run.sh` (scenarios 1–11) on the new build; results must match v0.10.0: no new failures (SC-005, FR-015). Record in `specs/003-terminal-support/verification.md`
 - [ ] T028 [US3] Owner repeats the T002 scenarios in Visual Studio Code on the new build (WebStorm: «не проверено», no license — owner decision 2026-09-30), 10 times each (SC-007), and records the comparison with the T002 baseline in `specs/003-terminal-support/verification.md`. Any difference is a defect of this feature
 
 **Checkpoint**: все истории независимо проверены
@@ -230,11 +238,11 @@ line='<preset>'; vared -p '> ' -c line; print -rn -- "$line" > '<out>/line-<n>.t
 
 **Purpose**: документация и обязательные gates конституции (принцип V, процесс п. 5 и 8)
 
-- [ ] T029 [P] Update `README.md` «Known limitations» (FR-017): replace «В терминалах и защищённых полях меняется только раскладка» with the new rules — Terminal.app replaces text typed after the last reset; list of reset actions; other terminals and editor-integrated terminals only switch the layout; full-screen programs (vim, less) are not guaranteed; secure input (for example the `sudo` password prompt) is never recorded or replaced, but hidden prompts that do not enable secure input (for example `read -s` in zsh) are treated as ordinary typing kept in memory until Enter; a key pressed during the short replacement series may leave one extra character (logged). Remove the matching «Pending sync» line from the Sync Impact Report in `.specify/memory/constitution.md`
-- [ ] T030 Build the release candidate as in [quickstart §3](./quickstart.md#3-release-кандидат-принцип-v) (the command list of [feature 002 quickstart §2](../002-symbol-conversion/quickstart.md#2-release-кандидат-по-конституции-принцип-v) without `testPairBuildTime`): full `swift test`; arm64 and x86_64 release builds with `MACOSX_DEPLOYMENT_TARGET=12.0`; `lipo -create` + `lipo -info` = `arm64 x86_64`; `bash scripts/test-package-release.sh`; quit ReTyper, copy into `ReTyper.app`, `codesign --force --sign -`, `codesign --verify --deep --strict --verbose=2`; `open ReTyper.app`. Record each result in `verification.md` (ad-hoc signing locally; CI signs with «ReTyper Dev»). Any failure blocks the rest
-- [ ] T031 On the T030 candidate run `Tools/ReTyperStand/run.sh` and `Tools/ReTyperStand/run.sh --terminal --repeat 10` (SC-001, SC-002, SC-005); record pass counts per scenario in `verification.md`. For T13 record min/median/max time; PASS only if max < 1 s (SC-004)
+- [X] T029 [P] README синхронизирован с поддержкой Terminal, сбросами, secure input/read -s и новым удержанием ввода. Старое ограничение про смешивание событий заменено актуальным контрактом. Pending sync снят.
+- [X] T030 Build the release candidate as in [quickstart §3](./quickstart.md#3-release-кандидат-принцип-v) (the command list of [feature 002 quickstart §2](../002-symbol-conversion/quickstart.md#2-release-кандидат-по-конституции-принцип-v) without `testPairBuildTime`): full `swift test`; arm64 and x86_64 release builds with `MACOSX_DEPLOYMENT_TARGET=12.0`; `lipo -create` + `lipo -info` = `arm64 x86_64`; `bash scripts/test-package-release.sh`; quit ReTyper, copy into `ReTyper.app`, `codesign --force --sign -`, `codesign --verify --deep --strict --verbose=2`; `open ReTyper.app`. Record each result in `verification.md` (ad-hoc signing locally; CI signs with «ReTyper Dev»). Any failure blocks the rest
+- [X] T031 На кандидате: обычный стенд 11/11, терминальный 230/230; T13 min/median/max и границы измерения приведены в verification.md. Полная ручная матрица не подменяется автоматической.
 - [ ] T032 Owner runs the manual scenarios 1–16 of [quickstart §5](./quickstart.md#5-ручная-проверка-выполняет-владелец) on the T030 candidate (1–11, 15 and 16 ten times each); a fresh screenshot of Terminal after scenario 1 goes to `specs/003-terminal-support/screenshots/terminal-scenario-1.png`. Record PASS/FAIL/not run per scenario in `verification.md`; scenario 14 (vim) is recorded as observed behaviour, not PASS/FAIL
-- [ ] T033 Check the **whole** log and caches per [quickstart §6](./quickstart.md#6-журнал) (SC-006, principle I, process item 8): `Terminal replacement:` lines exist; `grep -n -F -e 'ghbdtn' -e 'привет' -e 'сгкд' -e 'curl' ~/Library/Caches/com.retyper.app/retyper.log` and `grep -rl -F 'ghbdtn' ~/Library/Caches/com.retyper.app ~/Library/Preferences/com.retyper.app.plist` find nothing; review any hit manually. Record in `verification.md`
+- [X] T033 Check the **whole** log and caches per [quickstart §6](./quickstart.md#6-журнал) (SC-006, principle I, process item 8): `Terminal replacement:` lines exist; `grep -n -F -e 'ghbdtn' -e 'привет' -e 'сгкд' -e 'curl' ~/Library/Caches/com.retyper.app/retyper.log` and `grep -rl -F 'ghbdtn' ~/Library/Caches/com.retyper.app ~/Library/Preferences/com.retyper.app.plist` find nothing; review any hit manually. Record in `verification.md`
 - [ ] T034 Report to the owner from `specs/003-terminal-support/verification.md`: changed files, results of tests, stand, manual scenarios and log check, open risks (R6 interleaving, vim).
   - If T031 or T032 has any FAIL for Terminal.app, remove it from `typingTerminalBundleIDs` before any commit (constitution 7.0.0, principle III: only end-to-end verified terminals).
   - Commit and push only after an explicit request. Suggested: `docs: amend constitution to v7.0.0 (principle III: terminal replacement)` for the constitution and spec files, then `feat: replace typed text in Terminal`. Warn before pushing: a push to `main` starts the release pipeline.

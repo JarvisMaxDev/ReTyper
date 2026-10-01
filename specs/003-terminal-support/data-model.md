@@ -1,5 +1,10 @@
 # Data Model: Преобразование текста в терминалах
 
+> Редакция 2026-10-01: актуальная модель описана в [implementation.md](./implementation.md).
+> Ниже исходный дизайн. `isOverflowed` заменён общим `isSuspended`; окно вынесено в
+> `TerminalContext` вместе с полем/PID/launch date; `TerminalKey` получил `.suspend`.
+> Добавлены `TerminalRecorder` (epoch привязки) и `TerminalInputGate` (ticket и волна replay).
+
 **Дата**: 2026-09-29 | **Исследование**: [research.md](./research.md)
 
 Все сущности живут только в памяти процесса ReTyper. На диск, в `UserDefaults`, в журнал и в буфер

@@ -1,0 +1,71 @@
+[
+  {
+    "clipboardUnchanged" : true,
+    "context" : {
+      "classes" : [
+        "input"
+      ],
+      "role" : "AXTextArea"
+    },
+    "outcome" : "[2026-10-01 15:15:14.412] Replacement outcome: layoutOnly(reason: \"editor field not supported or context changed\")",
+    "pass" : true,
+    "scenario" : "find"
+  },
+  {
+    "clipboardUnchanged" : true,
+    "context" : {
+      "classes" : [
+        "xterm-helper-textarea"
+      ],
+      "role" : "AXTextField"
+    },
+    "outcome" : "[2026-10-01 15:15:17.181] Replacement outcome: layoutOnly(reason: \"editor field not supported or context changed\")",
+    "pass" : true,
+    "scenario" : "terminal"
+  },
+  {
+    "clipboard" : true,
+    "injected" : true,
+    "otherField" : true,
+    "outcome" : "[2026-10-01 15:15:18.891] Replacement outcome: layoutOnly(reason: \"context changed\")",
+    "pass" : true,
+    "scenario" : "typing"
+  },
+  {
+    "clipboard" : true,
+    "injected" : true,
+    "otherField" : true,
+    "outcome" : "[2026-10-01 15:15:20.830] Replacement outcome: layoutOnly(reason: \"context changed\")",
+    "pass" : true,
+    "scenario" : "field-change"
+  },
+  {
+    "clipboard" : true,
+    "injected" : true,
+    "otherField" : true,
+    "outcome" : "[2026-10-01 15:15:22.870] Replacement outcome: layoutOnly(reason: \"context changed\")",
+    "pass" : true,
+    "scenario" : "app-change"
+  },
+  {
+    "clipboard" : true,
+    "injected" : true,
+    "otherField" : true,
+    "outcome" : "[2026-10-01 15:15:24.916] Replacement outcome: layoutOnly(reason: \"context changed\")",
+    "pass" : true,
+    "scenario" : "round-trip"
+  },
+  {
+    "clipboard" : true,
+    "injected" : true,
+    "otherField" : true,
+    "outcome" : "[2026-10-01 15:15:27.340] Replacement outcome: layoutOnly(reason: \"editor: copy unverified\")",
+    "pass" : true,
+    "scenario" : "foreign-copy"
+  },
+  {
+    "outcome" : "[2026-10-01 15:15:29.268] Replacement outcome: layoutOnly(reason: \"editor field not supported or context changed\")",
+    "pass" : true,
+    "scenario" : "secure-input"
+  }
+]

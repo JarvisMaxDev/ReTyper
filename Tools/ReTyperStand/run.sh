@@ -11,6 +11,12 @@ set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 BUILD="$DIR/build"
+if [[ "${1:-}" == "--terminal" ]]; then
+    shift
+    mkdir -p "$BUILD"
+    swiftc -O "$DIR/TerminalDriver.swift" "$DIR/../../Sources/ReTyper/KeyLayout.swift" -o "$BUILD/terminal-driver"
+    exec "$BUILD/terminal-driver" "$@"
+fi
 OUT="${1:-$DIR/out/$(date +%Y%m%d-%H%M%S)}"
 APP="$BUILD/ReTyperStand.app"
 

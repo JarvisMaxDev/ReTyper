@@ -1,5 +1,12 @@
 # Quickstart: проверка замены в терминале
 
+> Актуализация 2026-10-01: база 0.10.1, конституция 9.0.0, S4:A принят.
+> См. [implementation.md](./implementation.md) для действующего дизайна и команд стенда.
+> Старые спайки ниже сохраняются как воспроизводимые эксперименты, не как незакрытый S4-блокер.
+> В release-командах `swift test/build` использовать `--build-system native` и получать
+> каталог тем же `swift build --build-system native --show-bin-path`.
+> Добавлены обязательные Enter0/10/30/80 и Typing0: никакой частично изменённой отправленной строки.
+
 **Дата**: 2026-09-29 | **Контракт**: [contracts/terminal-hotkey.md](./contracts/terminal-hotkey.md)
 | **Модель**: [data-model.md](./data-model.md)
 
