@@ -1,0 +1,29 @@
+{
+  "aborted" : null,
+  "date" : "2026-10-02T07:45:43Z",
+  "keyboardType" : 62,
+  "macOS" : "Version 26.6.2 (Build 25G83)",
+  "passed" : 1,
+  "results" : [
+    {
+      "after" : "привет",
+      "before" : "ghbdtn",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : "привет",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 09:45:41.643] Conversion: source=letters len=6 target=com.apple.keylayout.RussianWin",
+        "[2026-10-02 09:45:41.667] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 1,
+      "status" : "PASS",
+      "title" : "ordinary field with unrelated global secure input"
+    }
+  ],
+  "total" : 1
+}

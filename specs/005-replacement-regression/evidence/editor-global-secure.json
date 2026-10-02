@@ -1,0 +1,8 @@
+[
+  {
+    "outcome" : "[2026-10-02 09:50:57.184] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+    "pass" : true,
+    "scenario" : "ordinary-editor-global-secure",
+    "systemSuppressedHotkey" : false
+  }
+]

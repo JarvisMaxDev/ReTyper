@@ -8,6 +8,7 @@ let app = NSRunningApplication(processIdentifier: pid)!, other = NSRunningApplic
 let fixture = URL(fileURLWithPath: CommandLine.arguments[2]), out = URL(fileURLWithPath: CommandLine.arguments[3])
 let otherFile = URL(fileURLWithPath: CommandLine.arguments[5])
 let windowOnly = CommandLine.arguments.contains("--window-only")
+let secureOnly = CommandLine.arguments.contains("--secure-only")
 let windowTarget = fixture.deletingLastPathComponent().appendingPathComponent("window-target.txt")
 let previous = NSWorkspace.shared.frontmostApplication
 let pb = NSPasteboard.general
@@ -114,7 +115,7 @@ defer {
     TISSelectInputSource(originalLayout); previous?.activate()
 }
 do {
-    for panel in (windowOnly ? [] : ["find", "terminal"]) {
+    for panel in (windowOnly || secureOnly ? [] : ["find", "terminal"]) {
         try setup()
         if panel == "find" { try key(3, .maskCommand) } else { try key(50, .maskControl); pump(1) }
         let observed = context(), count = pb.changeCount
@@ -126,7 +127,7 @@ do {
         if panel == "find" { try key(53) } else { try key(50, .maskControl) }
         if !pass { throw Abort(reason: "Unsupported field accepted") }
     }
-    for name in (windowOnly ? ["window-change", "foreign-editor-copy"] : ["typing", "field-change", "app-change", "round-trip", "foreign-copy"]) {
+    for name in (secureOnly ? [] : windowOnly ? ["window-change", "foreign-editor-copy"] : ["typing", "field-change", "app-change", "round-trip", "foreign-copy"]) {
         try setup()
         let beforeOther = try String(contentsOf: otherFile, encoding: .utf8)
         let (outcome, injected) = try hotkey {
@@ -163,9 +164,16 @@ do {
     guard !IsSecureEventInputEnabled(), EnableSecureEventInput() == noErr else { throw Abort(reason: "Cannot own secure-input test") }
     let result: (String, Bool)
     do { defer { DisableSecureEventInput() }; result = try hotkey() }
-    let secureOK = pb.changeCount == count && (result.0 == "no event delivered" || result.0.contains("layoutOnly"))
-    print("secure-input", secureOK ? "PASS" : "FAIL", result.0)
-    results.append(["scenario": "secure-input", "pass": secureOK, "outcome": result.0])
+    let expected = String(repeating: "a", count: 150) + " привет"
+    let systemSuppressedHotkey = result.0 == "no event delivered"
+    if !systemSuppressedHotkey { try key(1, .maskCommand); pump(0.2) }
+    let actual = try String(contentsOf: fixture, encoding: .utf8)
+    let secureOK = pb.string(forType: .string) == sentinel
+        && (systemSuppressedHotkey ? pb.changeCount == count && actual == base
+            : result.0.contains("replaced(") && actual == expected)
+    print("ordinary-editor-global-secure", secureOK ? "PASS" : "FAIL", result.0)
+    results.append(["scenario": "ordinary-editor-global-secure", "pass": secureOK,
+                    "systemSuppressedHotkey": systemSuppressedHotkey, "outcome": result.0])
     }
 } catch { print("ABORT", error); results.append(["scenario": "harness", "pass": false, "error": String(describing: error)]) }
 try JSONSerialization.data(withJSONObject: results, options: [.prettyPrinted, .sortedKeys]).write(to: out.appendingPathComponent("report.json"))

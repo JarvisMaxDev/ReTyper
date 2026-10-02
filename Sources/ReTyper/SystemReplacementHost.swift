@@ -49,7 +49,9 @@ final class SystemReplacementHost: ReplacementHost, EditorMetadataHost {
     }
 
     func isSecureField() -> Bool {
-        onMain { IsSecureEventInputEnabled() } || FocusedText.isSecure()
+        // Editors copy an explicitly selected field; a global secure-input owner may belong
+        // to another application. Typed terminal recording keeps its separate global guard.
+        FocusedText.isSecure()
     }
 
     func press(_ key: EditingKey) {
@@ -76,25 +78,28 @@ final class SystemReplacementHost: ReplacementHost, EditorMetadataHost {
         }
         KeyboardMonitor.press(keyCode: CGKeyCode(kVK_ANSI_C), flags: .maskCommand)
 
-        // Up to 300 ms for the copy, then up to 50 ms more for its text to be written.
-        var changedAt: Int?
-        for attempt in 0..<35 {
+        // A native Copy can be followed by a second renderer write (for example OpenChamber).
+        // Do not publish the replacement until the latest copy generation has settled.
+        var copy = ClipboardCopyStability(initialChangeCount: before)
+        var sawChange = false
+        let deadline = ProcessInfo.processInfo.systemUptime + 0.35
+        while ProcessInfo.processInfo.systemUptime < deadline {
             usleep(10_000)
             let state = onMain { () -> (count: Int, text: String?) in
                 let pasteboard = NSPasteboard.general
-                return (pasteboard.changeCount, pasteboard.string(forType: .string))
+                let count = pasteboard.changeCount
+                let text = pasteboard.string(forType: .string)
+                // Do not combine a value from one generation with another generation's count.
+                return pasteboard.changeCount == count ? (count, text) : (pasteboard.changeCount, nil)
             }
             if state.count != before {
                 expectedChangeCount = state.count
-                if let text = state.text { return text }
-                let first = changedAt ?? attempt
-                changedAt = first
-                if attempt - first >= 5 { break }
-            } else if attempt >= 29 {
-                break
+                sawChange = true
             }
+            if copy.observe(changeCount: state.count, hasText: state.text != nil,
+                            now: ProcessInfo.processInfo.systemUptime) { return state.text }
         }
-        Logger.shared.log(changedAt == nil ? "Copy did not change the pasteboard" : "Copy produced no text")
+        Logger.shared.log(sawChange ? "Copy did not settle with text" : "Copy did not change the pasteboard")
         return nil
     }
 

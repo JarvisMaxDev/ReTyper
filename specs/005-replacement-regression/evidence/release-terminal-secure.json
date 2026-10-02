@@ -1,0 +1,14 @@
+[
+  {
+    "actual" : "ghbdtn",
+    "afterVisible" : "ghbdtn\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "beforeVisible" : "ghbdtn\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "cancelledBeforeEdit" : false,
+    "case" : "Secure",
+    "layout" : "com.apple.keylayout.RussianWin",
+    "log" : "[2026-10-02 10:02:38.093] Replacement outcome: layoutOnly(reason: \"secure input\")\n",
+    "passed" : true,
+    "repeat" : 1,
+    "seconds" : 0.025864958763122559
+  }
+]

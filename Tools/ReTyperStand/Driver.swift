@@ -30,7 +30,17 @@ struct Scenario {
     var dependsOn: Int? = nil
 }
 
-let scenarios: [Scenario] = [
+let scenarios: [Scenario] = CommandLine.arguments.contains("--copy-race") ? [
+    Scenario(number: 1, title: "native copy followed by delayed renderer copy", layout: latinLayout,
+             text: "ghbdtn", richClipboard: true, expectedText: "привет", expectedLayout: cyrillicLayout),
+] : CommandLine.arguments.contains("--secure-input") ? [
+    Scenario(number: 1, title: "ordinary field with unrelated global secure input", layout: latinLayout,
+             text: "ghbdtn", richClipboard: true, expectedText: "привет", expectedLayout: cyrillicLayout),
+] : CommandLine.arguments.contains("--secure-field") ? [
+    Scenario(number: 1, title: "real NSSecureTextField is never copied or replaced", layout: latinLayout,
+             text: "ghbdtn", richClipboard: true, expectedText: "ghbdtn", expectedLayout: cyrillicLayout,
+             expectedOutcome: "layoutOnly(reason: \"secure field\")"),
+] : [
     Scenario(number: 1, title: "^) on PL", layout: latinLayout, text: "^)",
              expectedText: ":)", expectedLayout: cyrillicLayout),
     Scenario(number: 2, title: "second press right after 1", layout: nil, text: nil,
@@ -210,8 +220,10 @@ guard enabledSource(latinLayout) != nil, enabledSource(cyrillicLayout) != nil el
 let originalLayout = currentLayout()
 let originalPasteboard = readPasteboard()
 let originalLastWord = CFPreferencesCopyAppValue(lastWordKey, reTyperBundleID as CFString)
+var ownsSecureInput = false
 
 func restoreEverything() {
+    if ownsSecureInput { DisableSecureEventInput(); ownsSecureInput = false }
     CFPreferencesSetAppValue(lastWordKey, originalLastWord, reTyperBundleID as CFString)
     CFPreferencesAppSynchronize(reTyperBundleID as CFString)
     writePasteboard(originalPasteboard)
@@ -257,6 +269,11 @@ for scenario in scenarios {
     if let layout = scenario.layout, !selectLayout(layout) { aborted = "cannot select \(layout)"; break }
     if let text = scenario.text {
         var extra = ["text": text]
+        if arguments.contains("--copy-race") {
+            extra["duplicateCopyMs"] = "35"
+            extra["pasteReadMs"] = "45"
+        }
+        if arguments.contains("--secure-field") { extra["secureField"] = "true" }
         if let selection = scenario.selection {
             extra["selectionLocation"] = String(selection.location)
             extra["selectionLength"] = String(selection.length)
@@ -284,6 +301,13 @@ for scenario in scenarios {
         aborted = "focus left the stand before scenario \(scenario.number); no keys posted"
         break
     }
+    if arguments.contains("--secure-input") {
+        guard !IsSecureEventInputEnabled(), EnableSecureEventInput() == noErr else {
+            aborted = "cannot own secure-input fixture"; break
+        }
+        ownsSecureInput = true
+        guard IsSecureEventInputEnabled() else { aborted = "secure-input fixture did not enable protection"; break }
+    }
     postOptionTap()
     usleep(120_000)
     postOptionTap()
@@ -297,6 +321,7 @@ for scenario in scenarios {
         pump(0.1)
     }
     pump(1.2)
+    if ownsSecureInput { DisableSecureEventInput(); ownsSecureInput = false }
     outcomeLines = logLines(since: logOffset)
 
     let after = stand("snapshot", id: "\(prefix)-after")
@@ -313,13 +338,16 @@ for scenario in scenarios {
     if let expected = scenario.layout, layoutBefore != expected {
         problems.append("layout before \(layoutBefore) != \(expected)")
     }
-    if layoutAfter != scenario.expectedLayout { problems.append("layout \(layoutAfter) != \(scenario.expectedLayout)") }
+    let secureHotkeySuppressed = arguments.contains("--secure-field") && !outcomeLines.contains { $0.contains("Replacement outcome:") }
+    if layoutAfter != scenario.expectedLayout && !(secureHotkeySuppressed && layoutAfter == layoutBefore) {
+        problems.append("layout \(layoutAfter) != \(scenario.expectedLayout)")
+    }
     if !clipboardRestored { problems.append("clipboard not restored") }
     if let outcome = outcomeLines.last(where: { $0.contains("Replacement outcome:") }) {
         if !outcome.contains(scenario.expectedOutcome) {
             problems.append("outcome is not \(scenario.expectedOutcome): \(outcome)")
         }
-    } else {
+    } else if !secureHotkeySuppressed {
         problems.append("no outcome in log")
     }
     if logHasText { problems.append("log contains scenario text") }

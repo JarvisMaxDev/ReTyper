@@ -1,0 +1,31 @@
+{
+  "aborted" : null,
+  "date" : "2026-10-02T06:59:44Z",
+  "keyboardType" : 62,
+  "macOS" : "Version 26.6.2 (Build 25G83)",
+  "passed" : 0,
+  "results" : [
+    {
+      "after" : "ghbdtn",
+      "before" : "ghbdtn",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : false,
+      "expected" : "привет",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 08:59:41.969] Conversion: source=letters len=6 target=com.apple.keylayout.RussianWin",
+        "[2026-10-02 08:59:41.978] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")",
+        "[2026-10-02 08:59:42.502] Clipboard restore skipped: pasteboard changed by another copy"
+      ],
+      "problems" : [
+        "text \"ghbdtn\" != \"привет\"",
+        "clipboard not restored"
+      ],
+      "scenario" : 1,
+      "status" : "FAIL",
+      "title" : "native copy followed by delayed renderer copy"
+    }
+  ],
+  "total" : 1
+}

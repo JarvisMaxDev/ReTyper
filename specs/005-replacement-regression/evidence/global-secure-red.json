@@ -1,0 +1,29 @@
+{
+  "aborted" : null,
+  "date" : "2026-10-02T07:43:52Z",
+  "keyboardType" : 62,
+  "macOS" : "Version 26.6.2 (Build 25G83)",
+  "passed" : 0,
+  "results" : [
+    {
+      "after" : "ghbdtn",
+      "before" : "ghbdtn",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : "привет",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 09:43:49.840] Replacement outcome: layoutOnly(reason: \"secure field\")"
+      ],
+      "problems" : [
+        "text \"ghbdtn\" != \"привет\"",
+        "outcome is not replaced(: [2026-10-02 09:43:49.840] Replacement outcome: layoutOnly(reason: \"secure field\")"
+      ],
+      "scenario" : 1,
+      "status" : "FAIL",
+      "title" : "ordinary field with unrelated global secure input"
+    }
+  ],
+  "total" : 1
+}

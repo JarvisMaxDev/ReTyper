@@ -17,6 +17,11 @@ if [[ "${1:-}" == "--terminal" ]]; then
     swiftc -O "$DIR/TerminalDriver.swift" "$DIR/../../Sources/ReTyper/KeyLayout.swift" -o "$BUILD/terminal-driver"
     exec "$BUILD/terminal-driver" "$@"
 fi
+DRIVER_ARGS=(--stand "$BUILD/ReTyperStand.app")
+while [[ "${1:-}" == "--copy-race" || "${1:-}" == "--secure-input" || "${1:-}" == "--secure-field" ]]; do
+    DRIVER_ARGS+=("$1")
+    shift
+done
 OUT="${1:-$DIR/out/$(date +%Y%m%d-%H%M%S)}"
 APP="$BUILD/ReTyperStand.app"
 
@@ -39,4 +44,4 @@ codesign --force --sign - "$APP" >/dev/null
 swiftc -O "$DIR/Driver.swift" -o "$BUILD/stand-driver"
 
 echo "Output: $OUT"
-"$BUILD/stand-driver" --stand "$APP" --out "$OUT"
+"$BUILD/stand-driver" "${DRIVER_ARGS[@]}" --out "$OUT"

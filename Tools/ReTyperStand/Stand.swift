@@ -10,6 +10,9 @@ final class StandDelegate: NSObject, NSApplicationDelegate {
     private let outputDirectory: URL
     private var window: NSWindow!
     private var textView: NSTextView!
+    private var duplicateCopyDelay = 0.0
+    private var pasteReadDelay = 0.0
+    private var secureField: NSSecureTextField?
 
     init(outputDirectory: URL) {
         self.outputDirectory = outputDirectory
@@ -61,12 +64,30 @@ final class StandDelegate: NSObject, NSApplicationDelegate {
         let editMenu = NSMenu(title: "Edit")
         editMenu.addItem(withTitle: "Undo", action: Selector(("undo:")), keyEquivalent: "z")
         editMenu.addItem(withTitle: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x")
-        editMenu.addItem(withTitle: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
-        editMenu.addItem(withTitle: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+        editMenu.addItem(withTitle: "Copy", action: #selector(copyForStand(_:)), keyEquivalent: "c").target = self
+        editMenu.addItem(withTitle: "Paste", action: #selector(pasteForStand(_:)), keyEquivalent: "v").target = self
         editMenu.addItem(withTitle: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
         editItem.submenu = editMenu
         mainMenu.addItem(editItem)
         NSApp.mainMenu = mainMenu
+    }
+
+    @objc private func copyForStand(_ sender: Any?) {
+        let selected = (textView.string as NSString).substring(with: textView.selectedRange())
+        textView.copy(sender)
+        guard duplicateCopyDelay > 0 else { return }
+        // Reproduces a native Copy followed by an asynchronous renderer clipboard write.
+        DispatchQueue.main.asyncAfter(deadline: .now() + duplicateCopyDelay) {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(selected, forType: .string)
+        }
+    }
+
+    @objc private func pasteForStand(_ sender: Any?) {
+        guard pasteReadDelay > 0 else { textView.paste(sender); return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + pasteReadDelay) { [weak self] in
+            self?.textView.paste(nil)
+        }
     }
 
     @objc private func handle(_ notification: Notification) {
@@ -74,6 +95,8 @@ final class StandDelegate: NSObject, NSApplicationDelegate {
               let action = info["action"], let id = info["id"] else { return }
         switch action {
         case "set":
+            duplicateCopyDelay = (Double(info["duplicateCopyMs"] ?? "") ?? 0) / 1000
+            pasteReadDelay = (Double(info["pasteReadMs"] ?? "") ?? 0) / 1000
             textView.string = info["text"] ?? ""
             let length = (textView.string as NSString).length
             let location = Int(info["selectionLocation"] ?? "") ?? length
@@ -81,6 +104,16 @@ final class StandDelegate: NSObject, NSApplicationDelegate {
             window.makeKeyAndOrderFront(nil)
             window.makeFirstResponder(textView)
             textView.setSelectedRange(NSRange(location: location, length: selected))
+            secureField?.removeFromSuperview()
+            secureField = nil
+            if info["secureField"] == "true" {
+                let field = NSSecureTextField(frame: NSRect(x: 12, y: 24, width: 600, height: 44))
+                field.stringValue = info["text"] ?? ""
+                field.font = .systemFont(ofSize: 24)
+                window.contentView?.addSubview(field)
+                secureField = field
+                window.makeFirstResponder(field)
+            }
             writeState(id: id, capture: "none")
         case "state":
             writeState(id: id, capture: "none")
@@ -127,15 +160,16 @@ final class StandDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func writeState(id: String, capture: String) {
-        let selection = textView.selectedRange()
+        let editor = secureField.flatMap { window.fieldEditor(false, for: $0) as? NSTextView } ?? textView!
+        let selection = editor.selectedRange()
         let state: [String: Any] = [
             "id": id,
-            "text": textView.string,
+            "text": secureField?.stringValue ?? textView.string,
             "selectionLocation": selection.location,
             "selectionLength": selection.length,
             "isActive": NSApp.isActive,
             "isKeyWindow": window.isKeyWindow,
-            "firstResponderIsText": window.firstResponder === textView,
+            "firstResponderIsText": window.firstResponder === editor,
             "capture": capture,
         ]
         guard let data = try? JSONSerialization.data(withJSONObject: state, options: [.sortedKeys]) else { return }

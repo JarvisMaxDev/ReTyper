@@ -36,6 +36,27 @@ bash Tools/ReTyperStand/run-editor-recovery.sh PID /absolute/test/repro.txt /abs
 
 ## Отмена и запрещённые поля
 
+Уточнение 2026-10-02: глобальный Secure Input сам по себе больше не запрещает замену
+в обычном поле редактора. Последний сценарий проверяет успешную замену и clipboard,
+либо отсутствие действий, если система не доставила сам хоткей. `--secure-only` запускает
+только этот сценарий; второй получатель тогда не используется (можно передать тот же PID/файл).
+Настоящие защищённые поля и терминальная запись при глобальной защите проверяются отдельно.
+
+Нативные воспроизводители в одном автоматически закрываемом окне:
+
+```bash
+bash Tools/ReTyperStand/run.sh --copy-race
+bash Tools/ReTyperStand/run.sh --secure-input
+bash Tools/ReTyperStand/run.sh --copy-race --secure-input
+bash Tools/ReTyperStand/run.sh --secure-field
+```
+
+`--copy-race` моделирует две записи clipboard на один Copy и отложенное чтение при Paste.
+`--secure-input` временно включает защиту в драйвере, проверяя обычное поле другого процесса.
+`--secure-field` использует настоящий NSSecureTextField с известной тестовой строкой;
+копирования и замены быть не должно. Нельзя запускать глобальный тест, если защита уже включена
+кем-то другим: драйвер откажется, чтобы не снимать чужой режим.
+
 ```bash
 swiftc -O Tools/ReTyperStand/EditorRecoveryGuards.swift -o Tools/ReTyperStand/build/editor-recovery-guards
 Tools/ReTyperStand/build/editor-recovery-guards CODE_PID /absolute/test/repro.txt /absolute/output TEXTEDIT_PID /absolute/native-probe.txt

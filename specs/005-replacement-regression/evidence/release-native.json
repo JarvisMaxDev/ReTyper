@@ -1,0 +1,218 @@
+{
+  "aborted" : null,
+  "date" : "2026-10-02T08:01:54Z",
+  "keyboardType" : 62,
+  "macOS" : "Version 26.6.2 (Build 25G83)",
+  "passed" : 11,
+  "results" : [
+    {
+      "after" : ":)",
+      "before" : "^)",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : ":)",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 10:01:30.654] Conversion: source=layout-only symbols len=2 target=com.apple.keylayout.RussianWin",
+        "[2026-10-02 10:01:30.658] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 1,
+      "status" : "PASS",
+      "title" : "^) on PL"
+    },
+    {
+      "after" : "^)",
+      "before" : ":)",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : "^)",
+      "layoutAfter" : "com.apple.keylayout.PolishPro",
+      "layoutBefore" : "com.apple.keylayout.RussianWin",
+      "log" : [
+        "[2026-10-02 10:01:32.782] Conversion: source=current layout len=2 target=com.apple.keylayout.PolishPro",
+        "[2026-10-02 10:01:32.802] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 2,
+      "status" : "PASS",
+      "title" : "second press right after 1"
+    },
+    {
+      "after" : "^)",
+      "before" : ":)",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : "^)",
+      "layoutAfter" : "com.apple.keylayout.PolishPro",
+      "layoutBefore" : "com.apple.keylayout.RussianWin",
+      "log" : [
+        "[2026-10-02 10:01:34.977] Conversion: source=current layout len=2 target=com.apple.keylayout.PolishPro",
+        "[2026-10-02 10:01:35.002] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.PolishPro\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 3,
+      "status" : "PASS",
+      "title" : ":) on RU"
+    },
+    {
+      "after" : "Привет:)",
+      "before" : "Ghbdtn^)",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : "Привет:)",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 10:01:37.185] Conversion: source=letters len=8 target=com.apple.keylayout.RussianWin",
+        "[2026-10-02 10:01:37.224] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 4,
+      "status" : "PASS",
+      "title" : "Ghbdtn^) on PL"
+    },
+    {
+      "after" : "?",
+      "before" : "&",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : "?",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 10:01:39.383] Conversion: source=layout-only symbols len=1 target=com.apple.keylayout.RussianWin",
+        "[2026-10-02 10:01:39.408] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 5,
+      "status" : "PASS",
+      "title" : "& on PL"
+    },
+    {
+      "after" : ")))",
+      "before" : ")))",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : ")))",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 10:01:41.604] Conversion: source=current layout len=3 target=com.apple.keylayout.RussianWin",
+        "[2026-10-02 10:01:41.620] Replacement outcome: layoutOnly(reason: \"nothing to convert\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 6,
+      "status" : "PASS",
+      "title" : "))) unchanged, layout switches"
+    },
+    {
+      "after" : "ё",
+      "before" : "§",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : "ё",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 10:01:43.787] Conversion: source=layout-only symbols len=1 target=com.apple.keylayout.RussianWin",
+        "[2026-10-02 10:01:43.811] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 7,
+      "status" : "PASS",
+      "title" : "§ on PL (ISO)"
+    },
+    {
+      "after" : "ок :)",
+      "before" : "ок ^)",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : "ок :)",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 10:01:46.045] Conversion: source=layout-only symbols len=2 target=com.apple.keylayout.RussianWin",
+        "[2026-10-02 10:01:46.086] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 8,
+      "status" : "PASS",
+      "title" : "last word mode: ок ^)"
+    },
+    {
+      "after" : "abc :) :)",
+      "before" : "abc ^) ^)",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : "abc :) :)",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 10:01:48.185] Conversion: source=layout-only symbols len=5 target=com.apple.keylayout.RussianWin",
+        "[2026-10-02 10:01:48.206] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 9,
+      "status" : "PASS",
+      "title" : "user selection ^) ^)"
+    },
+    {
+      "after" : "",
+      "before" : "",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : "",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 10:01:50.330] Replacement outcome: layoutOnly(reason: \"nothing before caret\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 10,
+      "status" : "PASS",
+      "title" : "empty field"
+    },
+    {
+      "after" : ":)",
+      "before" : "^)",
+      "capture" : "screencapturekit",
+      "clipboardRestored" : true,
+      "expected" : ":)",
+      "layoutAfter" : "com.apple.keylayout.RussianWin",
+      "layoutBefore" : "com.apple.keylayout.PolishPro",
+      "log" : [
+        "[2026-10-02 10:01:52.535] Conversion: source=layout-only symbols len=2 target=com.apple.keylayout.RussianWin",
+        "[2026-10-02 10:01:52.551] Replacement outcome: replaced(targetLayoutID: \"com.apple.keylayout.RussianWin\")"
+      ],
+      "problems" : [
+
+      ],
+      "scenario" : 11,
+      "status" : "PASS",
+      "title" : "RTF + text clipboard restored"
+    }
+  ],
+  "total" : 11
+}
